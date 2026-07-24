@@ -4,18 +4,21 @@
 
 {% block content %}
 <div class="flex flex-col md:flex-row gap-8">
-  <!-- Filtros laterales por Marca -->
-  <aside class="w-full md:w-1/4 bg-white p-6 rounded-lg shadow-sm h-fit">
-    <h3 class="font-bold text-lg mb-4 text-gray-900 border-b pb-2">Marcas</h3>
+
+  <!-- Filtros laterales por Marca (Estilo Tarjeta Flotante) -->
+  <aside class="w-full md:w-1/4 bg-gray-900/80 border border-gray-800/80 p-6 rounded-2xl shadow-xl h-fit backdrop-blur-sm">
+    <h3 class="font-bold text-lg mb-4 text-gray-100 border-b border-gray-800 pb-3 flex items-center gap-2">
+      <span>Marcas</span>
+    </h3>
     <ul class="space-y-2">
       <li>
-        <a href="{% url 'tienda:catalogo' %}" class="block py-1 px-2 rounded hover:bg-gray-100 {% if not marca_seleccionada %}font-bold text-red-600{% endif %}">
+        <a href="{% url 'tienda:catalogo' %}" class="block py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200 {% if not marca_seleccionada %}bg-red-600/20 text-red-400 border border-red-500/30 font-semibold{% else %}text-gray-400 hover:bg-gray-800/60 hover:text-gray-200{% endif %}">
           Todas las Marcas
         </a>
       </li>
       {% for marca in marcas %}
       <li>
-        <a href="{% url 'tienda:catalogo_marca' marca.slug %}" class="block py-1 px-2 rounded hover:bg-gray-100 {% if marca_seleccionada.id == marca.id %}font-bold text-red-600{% endif %}">
+        <a href="{% url 'tienda:catalogo_marca' marca.slug %}" class="block py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200 {% if marca_seleccionada.id == marca.id %}bg-red-600/20 text-red-400 border border-red-500/30 font-semibold{% else %}text-gray-400 hover:bg-gray-800/60 hover:text-gray-200{% endif %}">
           {{ marca.nombre }}
         </a>
       </li>
@@ -23,33 +26,55 @@
     </ul>
   </aside>
 
-  <!-- Lista de Productos -->
+  <!-- Lista de Productos en Grid -->
   <main class="w-full md:w-3/4">
-    <h2 class="text-2xl font-bold mb-6">
-      {% if marca_seleccionada %}{{ marca_seleccionada.nombre }}{% else %}Todos los Productos{% endif %}
+    <h2 class="text-3xl font-extrabold mb-6 tracking-tight text-white flex items-center justify-between">
+      <span>{% if marca_seleccionada %}{{ marca_seleccionada.nombre }}{% else %}Colección Completa{% endif %}</span>
+      <span class="text-xs font-normal text-gray-400 bg-gray-900 border border-gray-800 px-3 py-1 rounded-full">
+                {{ productos|length }} Producto(s)
+            </span>
     </h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for producto in productos %}
-      <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col justify-between hover:shadow-lg transition">
-        {% if producto.imagenes.first %}
-        <img src="{{ producto.imagenes.first.imagen.url }}" alt="{{ producto.nombre }}" class="w-full h-48 object-cover">
-        {% else %}
-        <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">Sin foto</div>
-        {% endif %}
-        <div class="p-4 flex-grow flex flex-col justify-between">
+      <div class="group bg-gray-900/90 border border-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:border-gray-700 transition-all duration-300 flex flex-col justify-between">
+
+        <!-- Contenedor Imagen con Alta Nitidez y Zoom On Hover -->
+        <div class="relative overflow-hidden bg-gray-950 h-56 flex items-center justify-center">
+          {% if producto.imagenes.first %}
+          <img src="{{ producto.imagenes.first.imagen.url }}" alt="{{ producto.nombre }}" class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500 ease-out">
+          {% else %}
+          <div class="text-gray-600 text-sm font-medium">Sin imagen</div>
+          {% endif %}
+          <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gray-300 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-white/10">
+                            {{ producto.marca.nombre }}
+                        </span>
+        </div>
+
+        <!-- Datos del producto -->
+        <div class="p-5 flex-grow flex flex-col justify-between">
           <div>
-            <span class="text-xs text-gray-400 uppercase tracking-wider">{{ producto.marca.nombre }}</span>
-            <h3 class="font-bold text-base mb-2 text-gray-800">{{ producto.nombre }}</h3>
+            <h3 class="font-bold text-lg text-white group-hover:text-red-400 transition-colors duration-200 line-clamp-1">
+              {{ producto.nombre }}
+            </h3>
           </div>
-          <div class="mt-4 flex justify-between items-center">
-            <span class="text-xl font-extrabold text-red-600">${{ producto.precio_regular }}</span>
-            <a href="{% url 'tienda:detalle_producto' producto.slug %}" class="bg-black text-white text-sm px-4 py-2 rounded hover:bg-gray-800 transition">Ver Detalle</a>
+
+          <div class="mt-6 flex items-center justify-between gap-2">
+            <div>
+              <span class="text-xs text-gray-500 uppercase block">Precio</span>
+              <span class="text-xl font-black text-red-500">${{ producto.precio_regular }}</span>
+            </div>
+            <a href="{% url 'tienda:detalle_producto' producto.slug %}" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white text-black hover:bg-red-600 hover:text-white transition-all duration-300 shadow-md hover:scale-105 active:scale-95">
+              Ver Más
+            </a>
           </div>
         </div>
+
       </div>
       {% empty %}
-      <p class="text-gray-500 col-span-3">No hay productos disponibles en esta categoría.</p>
+      <div class="col-span-full bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center text-gray-500">
+        <p class="text-lg">No hay tenis disponibles en esta sección por el momento.</p>
+      </div>
       {% endfor %}
     </div>
   </main>
