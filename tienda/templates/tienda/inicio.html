@@ -1,111 +1,55 @@
 {% extends 'tienda/base.html' %}
-{% load humanize %}
 
 {% block title %}Inicio - Velo Kicks{% endblock %}
 
 {% block content %}
-<!-- Contenedor Principal -->
-<div class="space-y-16 mt-4">
+<div class="max-w-6xl mx-auto py-8">
 
-    <!-- Secciones de Marcas (Logos) -->
-    {% if marcas %}
-    <section>
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-black text-white tracking-wider uppercase flex items-center gap-3">
-                <span class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(0,255,255,0.8)]"></span>
-                Nuestras Marcas
-            </h2>
-        </div>
+    <!-- Encabezado Estilizado -->
+    <div class="text-center mb-12">
+        <span class="inline-block py-1.5 px-4 rounded-full bg-white/5 border border-white/10 text-cyan-400 text-xs font-black tracking-[0.2em] uppercase mb-3 shadow-[0_0_15px_rgba(0,255,255,0.2)]">
+            INCREIBLES OFERTAS
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-md">
+            ELIJE TU MARCA FAVORITA
+        </h1>
+        <p class="text-gray-400 text-sm md:text-base mt-2 max-w-lg mx-auto">
+            Explora nuestro catálogo exclusivo.
+        </p>
+    </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {% for marca in marcas %}
-            <a href="{% url 'tienda:catalogo' %}?marca={{ marca.slug }}"
-               class="group relative bg-black/40 backdrop-blur-xl border border-white/10 hover:border-cyan-400 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,255,255,0.25)] hover:-translate-y-1">
+    <!-- Rejilla de Marcas Clickeables -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        {% for marca in marcas %}
+        <a href="{% url 'tienda:catalogo_marca' marca.slug %}"
+           class="group relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[160px] transition-all duration-300 hover:scale-105 hover:border-cyan-400/80 hover:shadow-[0_0_25px_rgba(0,255,255,0.3)]">
 
-                {% if marca.logo %}
-                <!-- Render del Logo de la Marca -->
-                <img src="{{ marca.logo.url }}"
-                     alt="{{ marca.nombre }}"
-                     class="h-10 md:h-12 w-auto object-contain filter brightness-90 group-hover:brightness-100 group-hover:drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] transition-all duration-300">
-                {% else %}
-                <!-- Respaldo en texto si la marca no tiene logo subido -->
-                <span class="text-lg font-black text-gray-300 group-hover:text-cyan-300 tracking-wider">
+            <!-- Logotipo de la Marca -->
+            {% if marca.logo %}
+            <img src="{{ marca.logo.url }}"
+                 alt="{{ marca.nombre }}"
+                 class="max-h-16 max-w-[80%] object-contain filter grayscale group-hover:grayscale-0 group-hover:drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] transition-all duration-300">
+            {% else %}
+            <!-- Nombre alternativo si la marca no tiene imagen en Django Admin -->
+            <span class="text-xl font-black text-gray-300 group-hover:text-cyan-400 transition-colors uppercase tracking-wider">
                         {{ marca.nombre }}
                     </span>
-                {% endif %}
+            {% endif %}
 
-            </a>
-            {% endfor %}
+            <!-- Etiqueta inferior de la Marca -->
+            <span class="mt-4 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-fuchsia-400 transition-colors">
+                    {{ marca.nombre }}
+                </span>
+
+            <!-- Glow interior en Hover -->
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-fuchsia-500/0 via-transparent to-cyan-500/0 group-hover:from-fuchsia-500/10 group-hover:to-cyan-500/10 transition-all duration-300 pointer-events-none"></div>
+        </a>
+        {% empty %}
+        <div class="col-span-full text-center py-12 bg-black/30 rounded-2xl border border-white/5">
+            <p class="text-gray-400 font-medium">No hay marcas disponibles por el momento.</p>
         </div>
-    </section>
-    {% endif %}
-
-    <!-- Productos Destacados -->
-    {% if productos %}
-    <section>
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-black text-white tracking-wider uppercase flex items-center gap-3">
-                <span class="w-3 h-3 rounded-full bg-fuchsia-500 shadow-[0_0_10px_rgba(255,0,255,0.8)]"></span>
-                Destacados Neón
-            </h2>
-            <a href="{% url 'tienda:catalogo' %}" class="text-xs font-bold uppercase tracking-widest text-cyan-400 hover:text-cyan-300 hover:underline transition-all">
-                Ver todo el catálogo &rarr;
-            </a>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {% for producto in productos %}
-            <div class="group bg-black/40 backdrop-blur-xl border border-white/10 hover:border-fuchsia-500/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,0,255,0.2)] flex flex-col justify-between">
-
-                <div>
-                    <!-- Imagen del Producto -->
-                    <div class="relative overflow-hidden bg-black/50 h-56 flex items-center justify-center">
-                        {% if producto.imagenes.all %}
-                        <img src="{{ producto.imagenes.first.imagen.url }}"
-                             alt="{{ producto.nombre }}"
-                             class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500">
-                        {% else %}
-                        <div class="text-gray-600 text-sm font-semibold">Sin Imagen 📷</div>
-                        {% endif %}
-
-                        <!-- Etiqueta de Marca -->
-                        <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-cyan-400 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border border-cyan-400/30">
-                            {{ producto.marca.nombre }}
-                        </span>
-                    </div>
-
-                    <!-- Información -->
-                    <div class="p-5">
-                        <h3 class="font-bold text-white text-lg tracking-tight line-clamp-1 group-hover:text-cyan-300 transition-colors">
-                            {{ producto.nombre }}
-                        </h3>
-                        <p class="text-gray-400 text-xs mt-1 line-clamp-2">
-                            {{ producto.descripcion }}
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Precio y Botón -->
-                <div class="p-5 pt-0 flex items-center justify-between border-t border-white/5 mt-2">
-                    <div>
-                        <span class="block text-[10px] text-gray-400 uppercase tracking-wider">Precio</span>
-                        <span class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">
-                            $ {{ producto.precio_regular|floatformat:0|intcomma }}
-                        </span>
-                    </div>
-
-                    <a href="{% url 'tienda:detalle_producto' producto.slug %}"
-                       class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400 text-cyan-300 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm">
-                        Ver
-                    </a>
-                </div>
-
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
+        {% endfor %}
+    </div>
 
 </div>
 {% endblock %}
-
