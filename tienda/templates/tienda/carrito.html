@@ -1,0 +1,84 @@
+{% extends 'tienda/base.html' %}
+{% load humanize %}
+
+{% block title %}Mi Carrito - Velo Kicks{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <!-- Título de la página -->
+    <h1 class="text-3xl md:text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 drop-shadow-[0_0_8px_rgba(0,255,255,0.6)] mb-8 text-center md:text-left">
+        TU CARRITO
+    </h1>
+
+    {% if request.session.carrito_compras %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Lista de Productos (Ocupa 2 columnas) -->
+        <div class="lg:col-span-2 space-y-4">
+            {% for key, item in request.session.carrito_compras.items %}
+            <div class="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_20px_rgba(0,255,255,0.05)] p-4 flex flex-col md:flex-row items-center gap-6 hover:border-cyan-500/50 transition-colors duration-300">
+
+                <!-- Imagen del producto (placeholder si no hay en sesión, ideal usar la real) -->
+                <div class="w-32 h-32 bg-gray-900 rounded-xl border border-white/5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <span class="text-4xl">👟</span>
+                </div>
+
+                <!-- Info del producto -->
+                <div class="flex-grow text-center md:text-left">
+                    <h3 class="text-xl font-bold text-white">{{ item.nombre }}</h3>
+                    <p class="text-cyan-400 text-sm font-semibold mt-1">Talla: {{ item.talla }}</p>
+                    <p class="text-gray-400 text-sm mt-1">Cantidad: {{ item.cantidad }}</p>
+                </div>
+
+                <!-- Precio y Botón Eliminar -->
+                <div class="flex flex-col items-center md:items-end gap-3 min-w-[120px]">
+                    <span class="text-xl font-black text-fuchsia-400">$ {{ item.precio|floatformat:0|intcomma }}</span>
+
+                    <a href="{% url 'tienda:eliminar_del_carrito' key %}" class="text-xs text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 px-3 py-1.5 rounded-lg transition-colors">
+                        Eliminar 🗑️
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Resumen de Compra (Ocupa 1 columna) -->
+        <div class="bg-black/60 backdrop-blur-2xl border border-fuchsia-500/30 rounded-3xl p-6 h-fit shadow-[0_0_30px_rgba(255,0,255,0.1)]">
+            <h2 class="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Resumen del Pedido</h2>
+
+            <div class="flex justify-between items-center mb-4 text-gray-300">
+                <span>Subtotal</span>
+                <span>Calculando...</span>
+            </div>
+            <div class="flex justify-between items-center mb-6 text-gray-300">
+                <span>Envío</span>
+                <span class="text-cyan-400 font-semibold">¡Gratis!</span>
+            </div>
+
+            <div class="flex justify-between items-center mb-8 border-t border-white/10 pt-4">
+                <span class="text-lg font-bold text-white">Total a Pagar</span>
+                <!-- Aquí asumo que tienes una función en cart.py para el total, si no, lo sumamos luego -->
+                <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">
+                        $ TOTAL
+                    </span>
+            </div>
+
+            <!-- Botón de Proceder al Pago Efecto Neón -->
+            <button class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-fuchsia-600 to-cyan-600 hover:from-cyan-500 hover:to-fuchsia-500 text-white shadow-[0_0_20px_rgba(255,0,255,0.4)] hover:shadow-[0_0_30px_rgba(0,255,255,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300">
+                Proceder al Pago 🚀
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <!-- Estado Vacío -->
+    <div class="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-12 text-center flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,255,255,0.05)]">
+        <div class="text-6xl mb-6 drop-shadow-[0_0_15px_rgba(0,255,255,0.5)]">🛒</div>
+        <h2 class="text-2xl font-bold text-white mb-4">Tu carrito está vacío</h2>
+        <p class="text-gray-400 mb-8 max-w-md">Parece que aún no has encontrado tus tenis ideales. ¡Explora nuestro catálogo y descubre el estilo del futuro!</p>
+        <a href="{% url 'tienda:catalogo' %}" class="px-8 py-3 rounded-full font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 hover:bg-cyan-500/40 hover:text-white hover:shadow-[0_0_20px_rgba(0,255,255,0.4)] transition-all duration-300">
+            Explorar Catálogo
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

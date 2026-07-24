@@ -1,101 +1,78 @@
 {% extends 'tienda/base.html' %}
 {% load humanize %}
 
-{% block title %}{{ producto.nombre }} - Tienda Deportiva{% endblock %}
+{% block title %}{{ producto.nombre }} - Velo Kicks{% endblock %}
 
 {% block content %}
-<div class="bg-gray-900/80 border border-gray-800/80 rounded-3xl shadow-2xl p-6 md:p-10 max-w-6xl mx-auto backdrop-blur-md">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+<!-- Contenedor con Efecto Vidrio (Glassmorphism) -->
+<div class="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_0_30px_rgba(0,255,255,0.05)] p-8 max-w-5xl mx-auto text-gray-100 mt-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-        <!-- Galería de imágenes estilo Moderno -->
+        <!-- Galería de imágenes -->
         <div class="space-y-4">
             {% if producto.imagenes.all %}
-            <div class="relative overflow-hidden bg-gray-950 rounded-2xl border border-gray-800/80 h-96 flex items-center justify-center shadow-inner group">
-                <img id="main-image" src="{{ producto.imagenes.first.imagen.url }}" alt="{{ producto.nombre }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+            <div class="bg-black/50 p-2 rounded-2xl border border-white/5 shadow-[0_0_15px_rgba(255,0,255,0.1)]">
+                <img id="main-image" src="{{ producto.imagenes.first.imagen.url }}" alt="{{ producto.nombre }}" class="w-full h-80 md:h-96 object-cover rounded-xl transition-all duration-300">
             </div>
-
             <!-- Miniaturas -->
-            <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+            <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
                 {% for img in producto.imagenes.all %}
-                <button type="button" onclick="document.getElementById('main-image').src='{{ img.imagen.url }}'" class="relative flex-shrink-0 w-20 h-20 bg-gray-950 rounded-xl overflow-hidden border border-gray-800 hover:border-red-500 focus:border-red-500 transition-all duration-200">
-                    <img src="{{ img.imagen.url }}" alt="Vista previa" class="w-full h-full object-cover">
-                </button>
+                <img src="{{ img.imagen.url }}" class="w-20 h-20 object-cover rounded-xl border border-white/10 cursor-pointer hover:border-cyan-400 hover:shadow-[0_0_10px_rgba(0,255,255,0.5)] transition-all duration-300" onclick="document.getElementById('main-image').src='{{ img.imagen.url }}'">
                 {% endfor %}
             </div>
             {% else %}
-            <div class="w-full h-96 bg-gray-950/80 rounded-2xl border border-gray-800 flex items-center justify-center text-gray-600 font-medium">
-                Sin Imagen Disponible
+            <div class="w-full h-80 bg-black/50 border border-white/10 flex items-center justify-center text-gray-500 rounded-2xl">
+                <span class="text-xl">Sin Imagen 📷</span>
             </div>
             {% endif %}
         </div>
 
         <!-- Información del producto y Formulario -->
-        <div class="flex flex-col justify-between space-y-6">
-            <div>
-                <!-- Etiqueta Marca -->
-                <span class="inline-block bg-black/60 text-gray-300 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-white/10 mb-3">
-                    {{ producto.marca.nombre }}
-                </span>
+        <div class="flex flex-col justify-center">
+            <span class="text-xs font-black uppercase tracking-[0.2em] text-cyan-400 mb-2 drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">{{ producto.marca.nombre }}</span>
+            <h1 class="text-4xl font-black text-white mb-3 tracking-tight">{{ producto.nombre }}</h1>
 
-                <!-- Título -->
-                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                    {{ producto.nombre }}
-                </h1>
+            <p class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400 mb-6 drop-shadow-[0_0_8px_rgba(255,0,255,0.3)]">
+                $ {{ producto.precio_regular|floatformat:0|intcomma }}
+            </p>
 
-                <!-- Precio en COP -->
-                <div class="mt-4 flex items-baseline gap-2">
-                    <span class="text-3xl font-black text-red-500">$ {{ producto.precio_regular|floatformat:0|intcomma }}</span>
-                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">COP</span>
-                </div>
-
-                <!-- Descripción -->
-                <p class="text-gray-400 text-sm leading-relaxed mt-4 border-t border-gray-800 pt-4">
-                    {{ producto.descripcion }}
-                </p>
-            </div>
+            <p class="text-gray-400 mb-8 leading-relaxed text-sm">{{ producto.descripcion }}</p>
 
             <!-- Formulario del Carrito -->
-            <form action="{% url 'tienda:agregar_al_carrito' producto.id %}" method="POST" id="form-carrito" class="space-y-6 border-t border-gray-800 pt-6">
+            <form action="{% url 'tienda:agregar_al_carrito' producto.id %}" method="POST" id="form-carrito" class="space-y-6">
                 {% csrf_token %}
 
-                <!-- Input oculto para enviar la variante a Python -->
+                <!-- Input oculto para enviar el ID de la variante seleccionada -->
                 <input type="hidden" name="variante_id" id="variante_id_input" value="">
 
-                <!-- Seleccionar Talla -->
+                <!-- Tallas y Variantes como Botones Neón -->
                 {% if producto.variantes.all %}
                 <div>
-                    <label class="block text-sm font-bold text-gray-200 uppercase tracking-wider mb-3">
-                        Selecciona tu Talla
-                    </label>
-                    <div class="flex flex-wrap gap-2.5" id="contenedor-tallas">
+                    <label class="block font-bold text-gray-300 mb-3 text-sm uppercase tracking-wider">Selecciona tu Talla</label>
+                    <div class="flex flex-wrap gap-3" id="contenedor-tallas">
                         {% for variante in producto.variantes.all %}
                         <button type="button"
                                 data-variante-id="{{ variante.id }}"
-                                class="btn-talla px-4 py-2.5 rounded-xl border border-gray-800 bg-gray-950 text-gray-300 font-semibold text-sm hover:border-gray-600 hover:text-white transition-all duration-200">
+                                class="btn-talla border border-white/20 bg-white/5 rounded-lg px-5 py-2 hover:border-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all duration-300 font-semibold text-gray-300 shadow-sm">
                             {{ variante.talla }} {% if variante.color_nombre %}({{ variante.color_nombre }}){% endif %}
                         </button>
                         {% endfor %}
                     </div>
-                    <p id="error-talla" class="text-red-400 text-xs mt-2 hidden font-medium">
+                    <p id="error-talla" class="text-red-400 text-xs mt-3 hidden bg-red-500/10 border border-red-500/30 p-2 rounded">
                         ⚠️ Por favor, selecciona una talla antes de agregar al carrito.
                     </p>
                 </div>
                 {% endif %}
 
-                <!-- Botón de Agregar al Carrito Estilo Glow -->
-                <button type="submit" class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-lg shadow-red-900/40 hover:shadow-red-600/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
-                    <span>Agregar al Carrito</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
+                <button type="submit" class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm bg-gradient-to-r from-fuchsia-600 to-cyan-600 hover:from-cyan-500 hover:to-fuchsia-500 text-white shadow-[0_0_20px_rgba(255,0,255,0.4)] hover:shadow-[0_0_30px_rgba(0,255,255,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 mt-4">
+                    Agregar al Carrito 🛒
                 </button>
             </form>
         </div>
-
     </div>
 </div>
 
-<!-- Script interactivo para las tallas -->
+<!-- Lógica actualizada para colores Neón en las tallas -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const botonesTalla = document.querySelectorAll('.btn-talla');
@@ -103,7 +80,6 @@
         const form = document.getElementById('form-carrito');
         const errorTalla = document.getElementById('error-talla');
 
-        // Seleccionar automáticamente la primera talla
         if (botonesTalla.length > 0) {
             marcarSeleccionado(botonesTalla[0]);
         }
@@ -115,13 +91,15 @@
         });
 
         function marcarSeleccionado(elemento) {
+            // Resetear todos los botones a su estado "apagado"
             botonesTalla.forEach(b => {
-                b.classList.remove('bg-white', 'text-black', 'border-white', 'shadow-md');
-                b.classList.add('bg-gray-950', 'text-gray-300', 'border-gray-800');
+                b.classList.remove('bg-cyan-500/20', 'border-cyan-400', 'text-cyan-300', 'shadow-[0_0_15px_rgba(0,255,255,0.4)]');
+                b.classList.add('border-white/20', 'bg-white/5', 'text-gray-300');
             });
 
-            elemento.classList.remove('bg-gray-950', 'text-gray-300', 'border-gray-800');
-            elemento.classList.add('bg-white', 'text-black', 'border-white', 'shadow-md');
+            // Encender el botón seleccionado
+            elemento.classList.remove('border-white/20', 'bg-white/5', 'text-gray-300');
+            elemento.classList.add('bg-cyan-500/20', 'border-cyan-400', 'text-cyan-300', 'shadow-[0_0_15px_rgba(0,255,255,0.4)]');
 
             inputOculto.value = elemento.getAttribute('data-variante-id');
             if (errorTalla) errorTalla.classList.add('hidden');

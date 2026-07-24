@@ -23,7 +23,7 @@
 <h2 class="text-2xl font-bold mb-6">Productos Destacados</h2>
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
     {% for producto in productos %}
-    <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col justify-between">
+    <div class="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_30px_rgba(0,255,255,0.05)] p-6">
         <div class="p-4">
             <h3 class="font-bold text-lg mb-2">{{ producto.nombre }}</h3>
             <p class="text-sm text-gray-500 mb-2">{{ producto.marca.nombre }}</p>
