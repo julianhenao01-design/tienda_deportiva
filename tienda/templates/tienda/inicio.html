@@ -1,37 +1,55 @@
 {% extends 'tienda/base.html' %}
 
-{% block title %}Inicio - Tienda Deportiva{% endblock %}
+{% block title %}Inicio - Velo Kicks{% endblock %}
 
 {% block content %}
-<section class="text-center py-12 bg-white rounded-lg shadow-sm mb-8">
-    <h1 class="text-4xl font-extrabold mb-4">El mejor calzado deportivo a tu alcance</h1>
-    <p class="text-gray-600 text-lg mb-6">Explora las mejores marcas y colecciones.</p>
-    <a href="{% url 'tienda:catalogo' %}" class="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 font-semibold">Ver Catálogo Completo</a>
-</section>
+<div class="max-w-6xl mx-auto py-8">
 
-<h2 class="text-2xl font-bold mb-6">Nuestras Marcas</h2>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-    {% for marca in marcas %}
-    <a href="{% url 'tienda:catalogo_marca' marca.slug %}" class="bg-white p-6 text-center font-bold rounded-lg shadow hover:shadow-lg transition">
-        {{ marca.nombre }}
-    </a>
-    {% empty %}
-    <p class="text-gray-500">No hay marcas registradas.</p>
-    {% endfor %}
-</div>
-
-<h2 class="text-2xl font-bold mb-6">Productos Destacados</h2>
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    {% for producto in productos %}
-    <div class="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_30px_rgba(0,255,255,0.05)] p-6">
-        <div class="p-4">
-            <h3 class="font-bold text-lg mb-2">{{ producto.nombre }}</h3>
-            <p class="text-sm text-gray-500 mb-2">{{ producto.marca.nombre }}</p>
-            <p class="text-xl font-extrabold text-red-600">${{ producto.precio_regular }}</p>
-        </div>
+    <!-- Encabezado Estilizado -->
+    <div class="text-center mb-12">
+        <span class="inline-block py-1.5 px-4 rounded-full bg-white/5 border border-white/10 text-cyan-400 text-xs font-black tracking-[0.2em] uppercase mb-3 shadow-[0_0_15px_rgba(0,255,255,0.2)]">
+            Nuestras Colecciones
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-md">
+            SELECCIONA UNA MARCA
+        </h1>
+        <p class="text-gray-400 text-sm md:text-base mt-2 max-w-lg mx-auto">
+            Explora nuestro catálogo exclusivo según tu estilo favorito.
+        </p>
     </div>
-    {% empty %}
-    <p class="text-gray-500">Aún no se han agregado productos.</p>
-    {% endfor %}
+
+    <!-- Rejilla de Marcas Clickeables -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        {% for marca in marcas %}
+        <a href="{% url 'tienda:catalogo_marca' marca.slug %}"
+           class="group relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[160px] transition-all duration-300 hover:scale-105 hover:border-cyan-400/80 hover:shadow-[0_0_25px_rgba(0,255,255,0.3)]">
+
+            <!-- Logotipo de la Marca -->
+            {% if marca.imagen %}
+            <img src="{{ marca.imagen.url }}"
+                 alt="{{ marca.nombre }}"
+                 class="max-h-16 max-w-[80%] object-contain filter grayscale group-hover:grayscale-0 group-hover:drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] transition-all duration-300">
+            {% else %}
+            <!-- Nombre alternativo si la marca no tiene imagen en Django Admin -->
+            <span class="text-xl font-black text-gray-300 group-hover:text-cyan-400 transition-colors uppercase tracking-wider">
+                        {{ marca.nombre }}
+                    </span>
+            {% endif %}
+
+            <!-- Etiqueta inferior de la Marca -->
+            <span class="mt-4 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-fuchsia-400 transition-colors">
+                    {{ marca.nombre }}
+                </span>
+
+            <!-- Glow interior en Hover -->
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-fuchsia-500/0 via-transparent to-cyan-500/0 group-hover:from-fuchsia-500/10 group-hover:to-cyan-500/10 transition-all duration-300 pointer-events-none"></div>
+        </a>
+        {% empty %}
+        <div class="col-span-full text-center py-12 bg-black/30 rounded-2xl border border-white/5">
+            <p class="text-gray-400 font-medium">No hay marcas disponibles por el momento.</p>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}
