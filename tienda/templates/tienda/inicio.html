@@ -1,19 +1,19 @@
 {% extends 'tienda/base.html' %}
 
-{% block title %}Inicio - Velo Kicks{% endblock %}
+{% block title %}Inicio - DUAL SHOES{% endblock %}
 
 {% block content %}
 <div class="max-w-6xl mx-auto py-8">
 
     <!-- Encabezado Estilizado -->
     <div class="text-center mb-12">
-        <span class="inline-block py-1.5 px-4 rounded-full bg-white/5 border border-white/10 text-cyan-400 text-xs font-black tracking-[0.2em] uppercase mb-3 shadow-[0_0_15px_rgba(0,255,255,0.2)]">
-            INCREIBLES OFERTAS
+        <span class="inline-block py-1 px-3.5 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-[11px] font-bold tracking-[0.2em] uppercase mb-3">
+            INCREÍBLES OFERTAS
         </span>
-        <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-md">
+        <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight uppercase">
             ELIJE TU MARCA FAVORITA
         </h1>
-        <p class="text-gray-400 text-sm md:text-base mt-2 max-w-lg mx-auto">
+        <p class="text-slate-500 text-sm md:text-base mt-2 max-w-lg mx-auto font-medium">
             Explora nuestro catálogo exclusivo.
         </p>
     </div>
@@ -22,33 +22,30 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
         {% for marca in marcas %}
         <a href="{% url 'tienda:catalogo_marca' marca.slug %}"
-           class="group relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-between min-h-[160px] transition-all duration-300 hover:scale-105 hover:border-cyan-400/80 hover:shadow-[0_0_25px_rgba(0,255,255,0.3)]">
+           class="group relative bg-white border border-slate-200/80 rounded-2xl p-6 flex flex-col items-center justify-between min-h-[160px] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/60 hover:border-slate-300">
 
             <!-- Contenedor con dimensiones estrictas para lograr simetría exacta -->
             <div class="w-full h-16 flex items-center justify-center p-1">
                 {% if marca.logo %}
                 <img src="{{ marca.logo.url }}"
                      alt="{{ marca.nombre }}"
-                     class="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 group-hover:drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] transition-all duration-300">
+                     class="max-w-full max-h-full object-contain group-hover:scale-105 transition-all duration-300">
                 {% else %}
                 <!-- Nombre alternativo si la marca no tiene imagen en Django Admin -->
-                <span class="text-xl font-black text-gray-300 group-hover:text-cyan-400 transition-colors uppercase tracking-wider">
+                <span class="text-xl font-black text-slate-800 group-hover:text-slate-900 transition-colors uppercase tracking-wider">
                     {{ marca.nombre }}
                 </span>
                 {% endif %}
             </div>
 
             <!-- Etiqueta inferior de la Marca -->
-            <span class="mt-4 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-fuchsia-400 transition-colors">
+            <span class="mt-4 text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-900 transition-colors">
                 {{ marca.nombre }}
             </span>
-
-            <!-- Glow interior en Hover -->
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-fuchsia-500/0 via-transparent to-cyan-500/0 group-hover:from-fuchsia-500/10 group-hover:to-cyan-500/10 transition-all duration-300 pointer-events-none"></div>
         </a>
         {% empty %}
-        <div class="col-span-full text-center py-12 bg-black/30 rounded-2xl border border-white/5">
-            <p class="text-gray-400 font-medium">No hay marcas disponibles por el momento.</p>
+        <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-slate-500 font-medium">No hay marcas disponibles por el momento.</p>
         </div>
         {% endfor %}
     </div>
