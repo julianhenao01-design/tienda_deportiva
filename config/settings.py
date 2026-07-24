@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Nuestra app de la tienda:
+    'django.contrib.humanize',
     'tienda',
 ]
 
