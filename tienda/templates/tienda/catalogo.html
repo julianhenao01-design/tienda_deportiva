@@ -1,0 +1,57 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}Catálogo - Tienda Deportiva{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row gap-8">
+  <!-- Filtros laterales por Marca -->
+  <aside class="w-full md:w-1/4 bg-white p-6 rounded-lg shadow-sm h-fit">
+    <h3 class="font-bold text-lg mb-4 text-gray-900 border-b pb-2">Marcas</h3>
+    <ul class="space-y-2">
+      <li>
+        <a href="{% url 'tienda:catalogo' %}" class="block py-1 px-2 rounded hover:bg-gray-100 {% if not marca_seleccionada %}font-bold text-red-600{% endif %}">
+          Todas las Marcas
+        </a>
+      </li>
+      {% for marca in marcas %}
+      <li>
+        <a href="{% url 'tienda:catalogo_marca' marca.slug %}" class="block py-1 px-2 rounded hover:bg-gray-100 {% if marca_seleccionada.id == marca.id %}font-bold text-red-600{% endif %}">
+          {{ marca.nombre }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- Lista de Productos -->
+  <main class="w-full md:w-3/4">
+    <h2 class="text-2xl font-bold mb-6">
+      {% if marca_seleccionada %}{{ marca_seleccionada.nombre }}{% else %}Todos los Productos{% endif %}
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for producto in productos %}
+      <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col justify-between hover:shadow-lg transition">
+        {% if producto.imagenes.first %}
+        <img src="{{ producto.imagenes.first.imagen.url }}" alt="{{ producto.nombre }}" class="w-full h-48 object-cover">
+        {% else %}
+        <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">Sin foto</div>
+        {% endif %}
+        <div class="p-4 flex-grow flex flex-col justify-between">
+          <div>
+            <span class="text-xs text-gray-400 uppercase tracking-wider">{{ producto.marca.nombre }}</span>
+            <h3 class="font-bold text-base mb-2 text-gray-800">{{ producto.nombre }}</h3>
+          </div>
+          <div class="mt-4 flex justify-between items-center">
+            <span class="text-xl font-extrabold text-red-600">${{ producto.precio_regular }}</span>
+            <a href="{% url 'tienda:detalle_producto' producto.slug %}" class="bg-black text-white text-sm px-4 py-2 rounded hover:bg-gray-800 transition">Ver Detalle</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-gray-500 col-span-3">No hay productos disponibles en esta categoría.</p>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+{% endblock %}
