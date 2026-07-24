@@ -8,13 +8,11 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
 <nav class="bg-black text-white p-4 shadow-md">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <a href="{% url 'tienda:inicio' %}" class="text-2xl font-bold tracking-wider uppercase">Tienda Deportiva</a>
-        <div class="space-x-6">
-            <a href="{% url 'tienda:inicio' %}" class="hover:text-red-500 transition">Inicio</a>
-            <a href="{% url 'tienda:catalogo' %}" class="hover:text-red-500 transition">Catálogo</a>
-            <a href="/admin/" class="bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition">Admin</a>
-        </div>
+    <!-- Se alinean los enlaces a la derecha/centro sin el logo -->
+    <div class="max-w-7xl mx-auto flex justify-end items-center space-x-6">
+        <a href="{% url 'tienda:inicio' %}" class="hover:text-red-500 transition">Inicio</a>
+        <a href="{% url 'tienda:catalogo' %}" class="hover:text-red-500 transition">Catálogo</a>
+        <a href="/admin/" class="bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition">Admin</a>
     </div>
 </nav>
 
