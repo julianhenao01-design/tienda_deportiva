@@ -22,24 +22,26 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
         {% for marca in marcas %}
         <a href="{% url 'tienda:catalogo_marca' marca.slug %}"
-           class="group relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[160px] transition-all duration-300 hover:scale-105 hover:border-cyan-400/80 hover:shadow-[0_0_25px_rgba(0,255,255,0.3)]">
+           class="group relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-between min-h-[160px] transition-all duration-300 hover:scale-105 hover:border-cyan-400/80 hover:shadow-[0_0_25px_rgba(0,255,255,0.3)]">
 
-            <!-- Logotipo de la Marca -->
-            {% if marca.logo %}
-            <img src="{{ marca.logo.url }}"
-                 alt="{{ marca.nombre }}"
-                 class="max-h-16 max-w-[80%] object-contain filter grayscale group-hover:grayscale-0 group-hover:drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] transition-all duration-300">
-            {% else %}
-            <!-- Nombre alternativo si la marca no tiene imagen en Django Admin -->
-            <span class="text-xl font-black text-gray-300 group-hover:text-cyan-400 transition-colors uppercase tracking-wider">
-                        {{ marca.nombre }}
-                    </span>
-            {% endif %}
+            <!-- Contenedor con dimensiones estrictas para lograr simetría exacta -->
+            <div class="w-full h-16 flex items-center justify-center p-1">
+                {% if marca.logo %}
+                <img src="{{ marca.logo.url }}"
+                     alt="{{ marca.nombre }}"
+                     class="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 group-hover:drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] transition-all duration-300">
+                {% else %}
+                <!-- Nombre alternativo si la marca no tiene imagen en Django Admin -->
+                <span class="text-xl font-black text-gray-300 group-hover:text-cyan-400 transition-colors uppercase tracking-wider">
+                    {{ marca.nombre }}
+                </span>
+                {% endif %}
+            </div>
 
             <!-- Etiqueta inferior de la Marca -->
             <span class="mt-4 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-fuchsia-400 transition-colors">
-                    {{ marca.nombre }}
-                </span>
+                {{ marca.nombre }}
+            </span>
 
             <!-- Glow interior en Hover -->
             <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-fuchsia-500/0 via-transparent to-cyan-500/0 group-hover:from-fuchsia-500/10 group-hover:to-cyan-500/10 transition-all duration-300 pointer-events-none"></div>
