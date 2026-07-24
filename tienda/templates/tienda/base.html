@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tienda Deportiva{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+<nav class="bg-black text-white p-4 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <a href="{% url 'tienda:inicio' %}" class="text-2xl font-bold tracking-wider uppercase">Tienda Deportiva</a>
+        <div class="space-x-6">
+            <a href="{% url 'tienda:inicio' %}" class="hover:text-red-500 transition">Inicio</a>
+            <a href="{% url 'tienda:catalogo' %}" class="hover:text-red-500 transition">Catálogo</a>
+            <a href="/admin/" class="bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition">Admin</a>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-6">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-black text-gray-400 text-center py-6 mt-12">
+    <p>&copy; 2026 Tienda Deportiva. Todos los derechos reservados.</p>
+</footer>
+</body>
+</html>
