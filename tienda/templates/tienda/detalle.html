@@ -5,10 +5,10 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto py-8 px-4">
-    <div class="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-10 shadow-sm">
+    <div class="bg-white rounded-3xl p-6 md:p-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-            <!-- COLUMNA IZQUIERDA: GALERÍA DE IMÁGENES -->
+            <!-- COLUMNA IZQUIERDA: GALERÍA Y SELECTOR VISUAL -->
             <div class="lg:col-span-7 space-y-4">
                 {% if producto.imagenes.all %}
                 <!-- Visor Principal -->
@@ -19,11 +19,12 @@
                          class="max-h-[400px] w-full object-contain transition-all duration-300">
                 </div>
 
-                <!-- Miniaturas / Galería Estilo Nike -->
-                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                <!-- Miniaturas / Galería que actúan como Selectores de Estilo -->
+                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar justify-start">
                     {% for img in producto.imagenes.all %}
                     <button type="button"
-                            onclick="document.getElementById('main-image').src='{{ img.imagen.url }}'; cambiarThumb(this);"
+                            data-img-id="{{ img.id }}"
+                            onclick="seleccionarImagen(this, '{{ img.imagen.url }}');"
                             class="thumb-btn w-20 h-20 bg-[#F6F6F6] rounded-xl border-2 {% if forloop.first %}border-black{% else %}border-transparent hover:border-slate-300{% endif %} p-1 flex-shrink-0 transition-all duration-200">
                         <img src="{{ img.imagen.url }}" class="w-full h-full object-contain rounded-lg">
                     </button>
@@ -36,35 +37,30 @@
                 {% endif %}
             </div>
 
-            <!-- COLUMNA DERECHA: INFORMACIÓN Y FORMULARIO DE ALISTAMIENTO -->
+            <!-- COLUMNA DERECHA: INFORMACIÓN Y TALLAS -->
             <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
                 <div>
-                    <!-- Título del Producto -->
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-1">
+                    <!-- Título y Precio -->
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
                         {{ producto.nombre }}
                     </h1>
-
-                    <!-- Subtítulo / Categoría / Marca -->
-                    <p class="text-sm md:text-base font-semibold text-slate-800 mb-3">
-                        Calzado deportivo {{ producto.marca.nombre }}
-                    </p>
-
-                    <!-- Precio -->
-                    <div class="text-2xl font-bold text-slate-900 mb-6">
+                    <div class="text-2xl font-bold text-slate-900 mb-8">
                         $ {{ producto.precio_regular|floatformat:0|intcomma }} COP
                     </div>
 
-                    <!-- Formulario de Alistamiento -->
+                    <!-- Formulario de Compra -->
                     <form action="{% url 'tienda:agregar_al_carrito' producto.id %}" method="POST" id="form-carrito" class="space-y-6">
                         {% csrf_token %}
 
-                        <!-- Inputs Ocultos enviados al servidor -->
-                        <input type="hidden" name="variante_id" id="variante_id_input" value="">
-                        <input type="hidden" name="talla" id="talla_input" value="36">
+                        <!-- Inputs Ocultos -->
+                        <input type="hidden" name="talla" id="talla_input" value="39"> <!-- Valor por defecto -->
+                        {% if producto.imagenes.all %}
+                        <input type="hidden" name="imagen_id" id="imagen_id_input" value="{{ producto.imagenes.first.id }}">
+                        {% endif %}
 
-                        <!-- SELECTOR DE TALLA (TODAS DE LA 36 A LA 44) -->
+                        <!-- SELECTOR DE TALLA (Igual a tu imagen) -->
                         <div>
-                            <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center justify-between mb-4">
                                 <label class="font-bold text-slate-900 text-sm">
                                     Selecciona la Talla
                                 </label>
@@ -73,37 +69,34 @@
                                 </a>
                             </div>
 
-                            <!-- Grilla Completa de Tallas -->
-                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="contenedor-tallas">
-                                <button type="button" data-talla="36" class="btn-talla border-2 border-black bg-slate-100 rounded-lg py-3 px-2 text-xs md:text-sm font-extrabold text-slate-900 transition-all text-center">36</button>
-                                <button type="button" data-talla="37" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">37</button>
-                                <button type="button" data-talla="38" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">38</button>
-                                <button type="button" data-talla="39" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">39</button>
-                                <button type="button" data-talla="40" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">40</button>
-                                <button type="button" data-talla="41" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">41</button>
-                                <button type="button" data-talla="42" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">42</button>
-                                <button type="button" data-talla="43" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">43</button>
-                                <button type="button" data-talla="44" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-xs md:text-sm font-semibold text-slate-900 hover:border-black transition-all text-center">44</button>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-3" id="contenedor-tallas">
+                                <button type="button" data-talla="36" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">36</button>
+                                <button type="button" data-talla="37" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">37</button>
+                                <button type="button" data-talla="38" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">38</button>
+                                <!-- Talla 39 preseleccionada como en tu imagen -->
+                                <button type="button" data-talla="39" class="btn-talla border-2 border-black bg-white rounded-lg py-3 px-2 text-sm font-bold text-slate-900 transition-all shadow-sm">39</button>
+                                <button type="button" data-talla="40" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">40</button>
+                                <button type="button" data-talla="41" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">41</button>
+                                <button type="button" data-talla="42" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">42</button>
+                                <button type="button" data-talla="43" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">43</button>
+                                <button type="button" data-talla="44" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">44</button>
                             </div>
-
-                            <p id="error-talla" class="text-red-600 text-xs mt-3 hidden bg-red-50 border border-red-200 p-2.5 rounded-lg font-bold">
-                                ⚠️ Por favor, selecciona una talla válida.
-                            </p>
                         </div>
 
-                        <!-- Banner Informativo Financiamiento Addi -->
+                        <!-- Banner Addi -->
                         <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-slate-800 text-white font-black text-xs flex items-center justify-center flex-shrink-0">
+                            <div class="w-8 h-8 rounded-full bg-[#111827] text-white font-black text-xs flex items-center justify-center flex-shrink-0">
                                 A
                             </div>
                             <div class="text-xs text-slate-700">
-                                Paga esta compra con <strong class="text-slate-900">Addi</strong> desde 6 hasta 24 cuotas. <span class="underline cursor-pointer font-semibold text-slate-800">Conoce más</span>
+                                Paga esta compra con <strong class="text-slate-900">Addi</strong> desde 6 hasta 24 cuotas.
+                                <span class="underline cursor-pointer font-semibold text-slate-800 ml-1">Conoce más</span>
                             </div>
                         </div>
 
-                        <!-- Botón Principal para Alistar Orden -->
+                        <!-- Botón Principal -->
                         <button type="submit"
-                                class="w-full py-4 rounded-full font-bold uppercase tracking-wider text-xs bg-slate-900 hover:bg-slate-800 text-white shadow-md transition-all active:scale-95">
+                                class="w-full py-4 rounded-full font-bold uppercase tracking-wider text-xs bg-[#0F172A] hover:bg-black text-white shadow-md transition-all active:scale-95">
                             Agregar al Carrito / Alistar Orden 🛒
                         </button>
                     </form>
@@ -123,29 +116,43 @@
     </div>
 </div>
 
-<!-- Lógica de Selección e Interacción -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Lógica de Selección de Tallas
         const botonesTalla = document.querySelectorAll('.btn-talla');
         const inputTalla = document.getElementById('talla_input');
 
         botonesTalla.forEach(btn => {
             btn.addEventListener('click', function() {
+                // Quitar selección a todos
                 botonesTalla.forEach(b => {
-                    b.classList.remove('border-2', 'border-black', 'bg-slate-100', 'font-extrabold');
-                    b.classList.add('border', 'border-slate-200', 'bg-white', 'font-semibold');
+                    b.classList.remove('border-2', 'border-black', 'font-bold', 'shadow-sm');
+                    b.classList.add('border', 'border-slate-200', 'font-semibold');
                 });
-                this.classList.remove('border-slate-200', 'bg-white', 'font-semibold');
-                this.classList.add('border-2', 'border-black', 'bg-slate-100', 'font-extrabold');
+
+                // Aplicar selección al clickeado
+                this.classList.remove('border', 'border-slate-200', 'font-semibold');
+                this.classList.add('border-2', 'border-black', 'font-bold', 'shadow-sm');
+
+                // Actualizar input oculto
                 inputTalla.value = this.getAttribute('data-talla');
             });
         });
     });
 
-    function cambiarThumb(btn) {
+    // Función para manejar el clic en las miniaturas (Imágenes)
+    function seleccionarImagen(btn, url) {
+        // 1. Cambia la imagen principal
+        document.getElementById('main-image').src = url;
+
+        // 2. Cambia los bordes de la miniatura para indicar cuál está seleccionada
         document.querySelectorAll('.thumb-btn').forEach(b => b.classList.replace('border-black', 'border-transparent'));
         btn.classList.replace('border-transparent', 'border-black');
+
+        // 3. Envía el ID exacto de la foto al formulario del carrito
+        const imagenInput = document.getElementById('imagen_id_input');
+        if (imagenInput) {
+            imagenInput.value = btn.getAttribute('data-img-id');
+        }
     }
 </script>
 {% endblock %}

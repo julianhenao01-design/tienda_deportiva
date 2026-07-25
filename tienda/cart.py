@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.conf import settings
-from .models import Producto, VarianteProducto
+from .models import Producto, ImagenProducto
 
 class Cart:
     def __init__(self, request):
@@ -10,14 +10,18 @@ class Cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
 
-    def add(self, producto_id, variante_id=None, cantidad=1):
-        item_key = f"{producto_id}_{variante_id}" if variante_id else str(producto_id)
+    def add(self, producto_id, talla, imagen_id, cantidad=1):
+        # Llave única que combina producto, talla y la foto exacta seleccionada
+        item_key = f"{producto_id}_{talla}_{imagen_id}"
+
         if item_key not in self.cart:
+            producto = Producto.objects.get(id=producto_id)
             self.cart[item_key] = {
                 'producto_id': producto_id,
-                'variante_id': variante_id,
+                'talla': talla,
+                'imagen_id': imagen_id,
                 'cantidad': 0,
-                'precio': str(Producto.objects.get(id=producto_id).precio_regular)
+                'precio': str(producto.precio_actual)
             }
         self.cart[item_key]['cantidad'] += cantidad
         self.save()
@@ -33,13 +37,21 @@ class Cart:
     def __iter__(self):
         for item_key, item in self.cart.items():
             producto = Producto.objects.get(id=item['producto_id'])
-            variante = VarianteProducto.objects.get(id=item['variante_id']) if item['variante_id'] else None
+
+            # Recuperamos la imagen específica que escogió el usuario
+            imagen_seleccionada = None
+            if item.get('imagen_id'):
+                try:
+                    imagen_seleccionada = ImagenProducto.objects.get(id=item['imagen_id'])
+                except ImagenProducto.DoesNotExist:
+                    imagen_seleccionada = producto.imagen_principal
 
             precio = Decimal(item['precio'])
             yield {
                 'key': item_key,
                 'producto': producto,
-                'variante': variante,
+                'talla': item['talla'],
+                'imagen_seleccionada': imagen_seleccionada,
                 'precio': precio,
                 'cantidad': item['cantidad'],
                 'total_precio': precio * item['cantidad']
@@ -52,5 +64,6 @@ class Cart:
         return sum(item['cantidad'] for item in self.cart.values())
 
     def clear(self):
-        del self.session[settings.CART_SESSION_ID]
-        self.save()
+        if settings.CART_SESSION_ID in self.session:
+            del self.session[settings.CART_SESSION_ID]
+            self.save()

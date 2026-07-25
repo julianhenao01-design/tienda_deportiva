@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Producto, Marca
 from .cart import Cart
 
-
 def inicio(request):
     marcas = Marca.objects.all()
-    productos_destacados = Producto.objects.filter(agotado=False)[:8]
+    # Eliminamos el filtro (agotado=False) porque retiramos el control de stock
+    productos_destacados = Producto.objects.all()[:8]
     return render(request, 'tienda/inicio.html', {
         'marcas': marcas,
         'productos': productos_destacados
@@ -14,7 +14,8 @@ def inicio(request):
 
 def catalogo(request, marca_slug=None):
     marcas = Marca.objects.all()
-    productos = Producto.objects.filter(agotado=False)
+    # Eliminamos el filtro (agotado=False)
+    productos = Producto.objects.all()
     marca_seleccionada = None
 
     if marca_slug:
@@ -30,6 +31,7 @@ def catalogo(request, marca_slug=None):
 
 def detalle_producto(request, slug):
     producto = get_object_or_404(Producto, slug=slug)
+    # Asegúrate de que el nombre de tu plantilla aquí coincida con el archivo real (detalle.html o detalle_producto.html)
     return render(request, 'tienda/detalle.html', {
         'producto': producto
     })
@@ -44,9 +46,19 @@ def detalle_carrito(request):
 
 def agregar_al_carrito(request, producto_id):
     cart = Cart(request)
-    variante_id = request.POST.get('variante_id')
+
+    # 1. Capturamos la talla (39 por defecto si no viene)
+    talla = request.POST.get('talla', '39')
+
+    # 2. Capturamos la foto exacta seleccionada
+    imagen_id = request.POST.get('imagen_id')
+
+    # 3. Cantidad
     cantidad = int(request.POST.get('cantidad', 1))
-    cart.add(producto_id=producto_id, variante_id=variante_id, cantidad=cantidad)
+
+    # Pasamos las nuevas variables al Carrito en lugar del variante_id
+    cart.add(producto_id=producto_id, talla=talla, imagen_id=imagen_id, cantidad=cantidad)
+
     return redirect('tienda:detalle_carrito')
 
 
@@ -54,13 +66,15 @@ def eliminar_del_carrito(request, item_key):
     cart = Cart(request)
     cart.remove(item_key)
     return redirect('tienda:detalle_carrito')
+
+
 def checkout(request):
     cart = Cart(request)
     if len(cart) == 0:
         return redirect('tienda:catalogo')
 
     if request.method == 'POST':
-        # Aquí puedes guardar la orden en la base de datos o enviar un mensaje por WhatsApp
+        # Aquí guardarás la orden en la base de datos
         cart.clear()
         return render(request, 'tienda/confirmacion.html')
 
