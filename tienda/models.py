@@ -28,6 +28,23 @@ class Producto(models.Model):
     def precio_actual(self):
         return self.precio_oferta if self.precio_oferta else self.precio_regular
 
+    # --- PROPIEDAD CLAVE PARA RENDERIZAR LA IMAGEN EN EL CATÁLOGO ---
+    @property
+    def imagen_principal(self):
+        """
+        Busca primero la foto marcada como 'es_principal'.
+        Si no hay ninguna principal marcada, toma la primera disponible de la galería.
+        """
+        img_principal = self.imagenes.filter(es_principal=True).first()
+        if img_principal:
+            return img_principal.imagen
+
+        primera_img = self.imagenes.first()
+        if primera_img:
+            return primera_img.imagen
+
+        return None
+
     def __str__(self):
         return f"{self.nombre} ({self.marca.nombre})"
 
@@ -46,7 +63,7 @@ class ImagenProducto(models.Model):
 class VarianteProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='variantes')
     color_nombre = models.CharField(max_length=50) # Ej: Rojo, Negro/Blanco
-    color_hex = models.CharField(max_length=7, default='#000000') # Ej: #FF0000 (para renderizar el botón de color)
+    color_hex = models.CharField(max_length=7, default='#000000') # Ej: #FF0000
     talla = models.CharField(max_length=10) # Ej: 39, 40, US 9
     stock = models.PositiveIntegerField(default=0)
 
@@ -76,7 +93,6 @@ class Orden(models.Model):
         ('ENVIADO', 'Pedido Enviado'),
     )
 
-    # Datos de envío (Libre acceso / Invitado o Registrado)
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     nombre_completo = models.CharField(max_length=150)
     email = models.EmailField()
@@ -84,9 +100,8 @@ class Orden(models.Model):
     direccion = models.CharField(max_length=255)
     ciudad = models.CharField(max_length=100)
 
-    # Descuentos y totales
     aplico_descuento_registro = models.BooleanField(default=False)
-    costo_envio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) # SIEMPRE GRATIS
+    costo_envio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     estado = models.CharField(max_length=20, choices=ESTADOS, default='PENDIENTE')
     fecha_creacion = models.DateTimeField(auto_now_add=True)

@@ -45,15 +45,16 @@
       {% for producto in productos %}
       <div class="group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-slate-200/60 hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between">
 
-        <!-- Contenedor Imagen con Alta Nitidez y Zoom On Hover -->
+        <!-- Contenedor Imagen Optimizado con la Propiedad del Modelo -->
         <div class="relative overflow-hidden bg-slate-50 h-56 flex items-center justify-center p-4">
-          {% if producto.imagenes.first %}
-          <img src="{{ producto.imagenes.first.imagen.url }}"
+          {% if producto.imagen_principal %}
+          <img src="{{ producto.imagen_principal.url }}"
                alt="{{ producto.nombre }}"
                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out">
           {% else %}
           <div class="text-slate-400 text-xs font-medium">Sin imagen</div>
           {% endif %}
+
           <span class="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
             {{ producto.marca.nombre }}
           </span>
@@ -90,3 +91,4 @@
   </main>
 </div>
 {% endblock %}
+
