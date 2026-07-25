@@ -16,6 +16,8 @@ CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
+    "unfold",                      # Dashboard Unfold (debe ir antes de admin)
+    "unfold.contrib.filters",      # Filtros avanzados estilo Tailwind
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,7 +59,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
-# En tu PC usará SQLite, en Railway se conectará automáticamente a PostgreSQL
 DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
@@ -74,7 +75,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'es-co'  # Cambiado a español
+LANGUAGE_CODE = 'es-co'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
 USE_TZ = True
@@ -83,4 +84,39 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media files (Imágenes de productos y marcas)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 CART_SESSION_ID = 'carrito_compras'
+
+# ==============================================================================
+# CONFIGURACIÓN DEL PANEL DE ADMINISTRACIÓN (DJANGO UNFOLD)
+# ==============================================================================
+UNFOLD = {
+    "SITE_TITLE": "DUAL SHOES | Admin",
+    "SITE_HEADER": "DUAL SHOES",
+    "SITE_SUBHEADER": "Panel de Gestión de Inventario y Pedidos",
+    "SHOW_HISTORY": True,
+    "SHOW_LANGUAGES": False,
+    "COLORS": {
+        "primary": {
+            "50": "250 250 250",
+            "100": "244 244 245",
+            "200": "228 228 231",
+            "300": "212 212 216",
+            "400": "161 161 170",
+            "500": "113 113 122",
+            "600": "82 82 91",
+            "700": "63 63 70",
+            "800": "39 39 42",
+            "900": "24 24 27",
+            "950": "9 9 11",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+    },
+}
