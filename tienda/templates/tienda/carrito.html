@@ -15,31 +15,37 @@
         </h1>
     </div>
 
-    {% if request.session.carrito_compras %}
+    {% if cart %}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         <!-- Lista de Productos (Ocupa 2 columnas) -->
         <div class="lg:col-span-2 space-y-4">
-            {% for key, item in request.session.carrito_compras.items %}
+            {% for item in cart %}
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center gap-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300">
 
-                <!-- Imagen del producto -->
-                <div class="w-28 h-28 bg-slate-50 rounded-xl border border-slate-200 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                <!-- Imagen exacta del producto seleccionada por el usuario -->
+                <div class="w-28 h-28 bg-slate-50 rounded-xl border border-slate-200 flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
+                    {% if item.imagen_seleccionada and item.imagen_seleccionada.imagen %}
+                    <img src="{{ item.imagen_seleccionada.imagen.url }}" alt="{{ item.producto.nombre }}" class="w-full h-full object-contain rounded-lg">
+                    {% elif item.producto.imagen_principal %}
+                    <img src="{{ item.producto.imagen_principal.url }}" alt="{{ item.producto.nombre }}" class="w-full h-full object-contain rounded-lg">
+                    {% else %}
                     <span class="text-4xl">👟</span>
+                    {% endif %}
                 </div>
 
                 <!-- Info del producto -->
                 <div class="flex-grow text-center md:text-left">
-                    <h3 class="text-xl font-bold text-slate-900 tracking-tight">{{ item.nombre }}</h3>
+                    <h3 class="text-xl font-bold text-slate-900 tracking-tight">{{ item.producto.nombre }}</h3>
                     <p class="text-slate-600 text-sm font-semibold mt-1">Talla: <span class="text-slate-900">{{ item.talla }}</span></p>
                     <p class="text-slate-500 text-sm mt-1">Cantidad: <span class="font-bold text-slate-800">{{ item.cantidad }}</span></p>
                 </div>
 
                 <!-- Precio y Botón Eliminar -->
                 <div class="flex flex-col items-center md:items-end gap-3 min-w-[120px]">
-                    <span class="text-xl font-black text-slate-900">$ {{ item.precio|floatformat:0|intcomma }}</span>
+                    <span class="text-xl font-black text-slate-900">$ {{ item.total_precio|floatformat:0|intcomma }}</span>
 
-                    <a href="{% url 'tienda:eliminar_del_carrito' key %}" class="text-xs text-red-600 hover:text-red-800 border border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1">
+                    <a href="{% url 'tienda:eliminar_del_carrito' item.key %}" class="text-xs text-red-600 hover:text-red-800 border border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1">
                         Eliminar 🗑️
                     </a>
                 </div>
@@ -53,7 +59,7 @@
 
             <div class="flex justify-between items-center mb-4 text-slate-600 text-sm">
                 <span>Subtotal</span>
-                <span class="font-semibold text-slate-800">Calculando...</span>
+                <span class="font-semibold text-slate-800">$ {{ cart.get_total_price|floatformat:0|intcomma }}</span>
             </div>
             <div class="flex justify-between items-center mb-6 text-slate-600 text-sm">
                 <span>Envío</span>
@@ -63,14 +69,14 @@
             <div class="flex justify-between items-center mb-8 border-t border-slate-100 pt-4">
                 <span class="text-sm font-bold text-slate-900 uppercase">Total a Pagar</span>
                 <span class="text-2xl font-black text-slate-900">
-                    $ TOTAL
+                    $ {{ cart.get_total_price|floatformat:0|intcomma }}
                 </span>
             </div>
 
-            <!-- Botón de Proceder al Pago -->
-            <button class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-xs bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg transition-all duration-200 active:scale-95">
+            <!-- Botón de Proceder al Pago conectado a la vista checkout -->
+            <a href="{% url 'tienda:checkout' %}" class="block text-center w-full py-4 rounded-xl font-bold uppercase tracking-wider text-xs bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg transition-all duration-200 active:scale-95">
                 Proceder al Pago 🚀
-            </button>
+            </a>
         </div>
     </div>
     {% else %}

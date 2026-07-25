@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto py-8 px-4">
-    <div class="bg-white rounded-3xl p-6 md:p-10">
+    <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
             <!-- COLUMNA IZQUIERDA: GALERÍA Y SELECTOR VISUAL -->
@@ -30,6 +30,13 @@
                     </button>
                     {% endfor %}
                 </div>
+                {% elif producto.imagen_principal %}
+                <!-- Caso alternativo: Imagen Principal -->
+                <div class="bg-[#F6F6F6] rounded-2xl p-6 flex items-center justify-center min-h-[380px] md:min-h-[460px]">
+                    <img src="{{ producto.imagen_principal.url }}"
+                         alt="{{ producto.nombre }}"
+                         class="max-h-[400px] w-full object-contain">
+                </div>
                 {% else %}
                 <div class="w-full h-96 bg-[#F6F6F6] rounded-2xl flex items-center justify-center text-slate-400 font-medium">
                     <span>Sin Imagen Disponible 📷</span>
@@ -44,8 +51,14 @@
                     <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
                         {{ producto.nombre }}
                     </h1>
-                    <div class="text-2xl font-bold text-slate-900 mb-8">
-                        $ {{ producto.precio_regular|floatformat:0|intcomma }} COP
+
+                    <div class="flex items-baseline gap-3 mb-8">
+                        {% if producto.precio_oferta %}
+                        <span class="text-2xl font-black text-slate-900">$ {{ producto.precio_oferta|floatformat:0|intcomma }} COP</span>
+                        <span class="text-lg font-bold text-slate-400 line-through">$ {{ producto.precio_regular|floatformat:0|intcomma }} COP</span>
+                        {% else %}
+                        <span class="text-2xl font-extrabold text-slate-900">$ {{ producto.precio_regular|floatformat:0|intcomma }} COP</span>
+                        {% endif %}
                     </div>
 
                     <!-- Formulario de Compra -->
@@ -58,7 +71,7 @@
                         <input type="hidden" name="imagen_id" id="imagen_id_input" value="{{ producto.imagenes.first.id }}">
                         {% endif %}
 
-                        <!-- SELECTOR DE TALLA (Igual a tu imagen) -->
+                        <!-- SELECTOR DE TALLA -->
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <label class="font-bold text-slate-900 text-sm">
@@ -73,13 +86,25 @@
                                 <button type="button" data-talla="36" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">36</button>
                                 <button type="button" data-talla="37" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">37</button>
                                 <button type="button" data-talla="38" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">38</button>
-                                <!-- Talla 39 preseleccionada como en tu imagen -->
+                                <!-- Talla 39 preseleccionada -->
                                 <button type="button" data-talla="39" class="btn-talla border-2 border-black bg-white rounded-lg py-3 px-2 text-sm font-bold text-slate-900 transition-all shadow-sm">39</button>
                                 <button type="button" data-talla="40" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">40</button>
                                 <button type="button" data-talla="41" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">41</button>
                                 <button type="button" data-talla="42" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">42</button>
                                 <button type="button" data-talla="43" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">43</button>
                                 <button type="button" data-talla="44" class="btn-talla border border-slate-200 bg-white rounded-lg py-3 px-2 text-sm font-semibold text-slate-900 hover:border-black transition-all">44</button>
+                            </div>
+                        </div>
+
+                        <!-- SELECTOR DE CANTIDAD -->
+                        <div>
+                            <label class="font-bold text-slate-900 text-sm block mb-3">
+                                Cantidad
+                            </label>
+                            <div class="flex items-center border border-slate-200 rounded-xl w-36 overflow-hidden bg-slate-50">
+                                <button type="button" id="btn-disminuir" class="w-12 py-2.5 font-bold text-slate-600 hover:bg-slate-200 transition-all">-</button>
+                                <input type="number" name="cantidad" id="cantidad_input" value="1" min="1" max="10" readonly class="w-12 text-center font-extrabold text-slate-900 bg-transparent border-none focus:ring-0 p-0">
+                                <button type="button" id="btn-aumentar" class="w-12 py-2.5 font-bold text-slate-600 hover:bg-slate-200 transition-all">+</button>
                             </div>
                         </div>
 
@@ -104,9 +129,9 @@
                     <!-- Descripción -->
                     <div class="mt-8 border-t border-slate-200 pt-6">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Descripción</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed font-normal">
-                            {{ producto.descripcion }}
-                        </p>
+                        <div class="text-slate-600 text-sm leading-relaxed font-normal">
+                            {{ producto.descripcion|linebreaks }}
+                        </div>
                     </div>
 
                 </div>
@@ -118,37 +143,63 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- LÓGICA DE SELECCIÓN DE TALLA ---
         const botonesTalla = document.querySelectorAll('.btn-talla');
         const inputTalla = document.getElementById('talla_input');
 
         botonesTalla.forEach(btn => {
             btn.addEventListener('click', function() {
-                // Quitar selección a todos
                 botonesTalla.forEach(b => {
                     b.classList.remove('border-2', 'border-black', 'font-bold', 'shadow-sm');
                     b.classList.add('border', 'border-slate-200', 'font-semibold');
                 });
 
-                // Aplicar selección al clickeado
                 this.classList.remove('border', 'border-slate-200', 'font-semibold');
                 this.classList.add('border-2', 'border-black', 'font-bold', 'shadow-sm');
 
-                // Actualizar input oculto
                 inputTalla.value = this.getAttribute('data-talla');
             });
         });
+
+        // --- LÓGICA DE CANTIDAD ---
+        const btnDisminuir = document.getElementById('btn-disminuir');
+        const btnAumentar = document.getElementById('btn-aumentar');
+        const cantidadInput = document.getElementById('cantidad_input');
+
+        if (btnDisminuir && btnAumentar && cantidadInput) {
+            btnDisminuir.addEventListener('click', function() {
+                let actual = parseInt(cantidadInput.value) || 1;
+                if (actual > 1) {
+                    cantidadInput.value = actual - 1;
+                }
+            });
+
+            btnAumentar.addEventListener('click', function() {
+                let actual = parseInt(cantidadInput.value) || 1;
+                if (actual < 10) {
+                    cantidadInput.value = actual + 1;
+                }
+            });
+        }
     });
 
-    // Función para manejar el clic en las miniaturas (Imágenes)
+    // --- LÓGICA DE GALERÍA / MINIATURAS ---
     function seleccionarImagen(btn, url) {
-        // 1. Cambia la imagen principal
-        document.getElementById('main-image').src = url;
+        const mainImage = document.getElementById('main-image');
+        if (mainImage) {
+            mainImage.src = url;
+        }
 
-        // 2. Cambia los bordes de la miniatura para indicar cuál está seleccionada
-        document.querySelectorAll('.thumb-btn').forEach(b => b.classList.replace('border-black', 'border-transparent'));
-        btn.classList.replace('border-transparent', 'border-black');
+        // Remueve el borde activo de todas las miniaturas y se lo añade a la clickeada
+        document.querySelectorAll('.thumb-btn').forEach(b => {
+            b.classList.remove('border-black');
+            b.classList.add('border-transparent');
+        });
 
-        // 3. Envía el ID exacto de la foto al formulario del carrito
+        btn.classList.remove('border-transparent');
+        btn.classList.add('border-black');
+
+        // Actualiza el ID de la foto seleccionada en el input oculto
         const imagenInput = document.getElementById('imagen_id_input');
         if (imagenInput) {
             imagenInput.value = btn.getAttribute('data-img-id');

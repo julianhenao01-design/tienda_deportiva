@@ -10,19 +10,27 @@ class Cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
 
-    def add(self, producto_id, talla, imagen_id, cantidad=1):
-        # Llave única que combina producto, talla y la foto exacta seleccionada
-        item_key = f"{producto_id}_{talla}_{imagen_id}"
+    def add(self, producto_id, talla, imagen_id=None, cantidad=1):
+        # Generamos una clave única según producto, talla e imagen seleccionada
+        img_id_str = str(imagen_id) if imagen_id and str(imagen_id).isdigit() else 'default'
+        item_key = f"{producto_id}_{talla}_{img_id_str}"
 
         if item_key not in self.cart:
             producto = Producto.objects.get(id=producto_id)
+
+            # Obtenemos el precio actual o el precio regular como respaldo
+            precio_val = getattr(producto, 'precio_actual', getattr(producto, 'precio_oferta', producto.precio_regular))
+            if not precio_val:
+                precio_val = producto.precio_regular
+
             self.cart[item_key] = {
                 'producto_id': producto_id,
                 'talla': talla,
-                'imagen_id': imagen_id,
+                'imagen_id': img_id_str,
                 'cantidad': 0,
-                'precio': str(producto.precio_actual)
+                'precio': str(precio_val)
             }
+
         self.cart[item_key]['cantidad'] += cantidad
         self.save()
 
@@ -40,11 +48,20 @@ class Cart:
 
             # Recuperamos la imagen específica que escogió el usuario
             imagen_seleccionada = None
-            if item.get('imagen_id'):
+            imagen_id = item.get('imagen_id')
+
+            if imagen_id and str(imagen_id).isdigit():
                 try:
-                    imagen_seleccionada = ImagenProducto.objects.get(id=item['imagen_id'])
+                    imagen_seleccionada = ImagenProducto.objects.get(id=int(imagen_id))
                 except ImagenProducto.DoesNotExist:
+                    imagen_seleccionada = None
+
+            # Fallbacks seguros en caso de que no haya imagen_id o se haya eliminado
+            if not imagen_seleccionada:
+                if hasattr(producto, 'imagen_principal') and producto.imagen_principal:
                     imagen_seleccionada = producto.imagen_principal
+                elif hasattr(producto, 'imagenes') and producto.imagenes.exists():
+                    imagen_seleccionada = producto.imagenes.first()
 
             precio = Decimal(item['precio'])
             yield {

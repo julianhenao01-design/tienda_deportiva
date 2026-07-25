@@ -4,7 +4,6 @@ from .cart import Cart
 
 def inicio(request):
     marcas = Marca.objects.all()
-    # Eliminamos el filtro (agotado=False) porque retiramos el control de stock
     productos_destacados = Producto.objects.all()[:8]
     return render(request, 'tienda/inicio.html', {
         'marcas': marcas,
@@ -14,7 +13,6 @@ def inicio(request):
 
 def catalogo(request, marca_slug=None):
     marcas = Marca.objects.all()
-    # Eliminamos el filtro (agotado=False)
     productos = Producto.objects.all()
     marca_seleccionada = None
 
@@ -31,7 +29,6 @@ def catalogo(request, marca_slug=None):
 
 def detalle_producto(request, slug):
     producto = get_object_or_404(Producto, slug=slug)
-    # Asegúrate de que el nombre de tu plantilla aquí coincida con el archivo real (detalle.html o detalle_producto.html)
     return render(request, 'tienda/detalle.html', {
         'producto': producto
     })
@@ -50,13 +47,18 @@ def agregar_al_carrito(request, producto_id):
     # 1. Capturamos la talla (39 por defecto si no viene)
     talla = request.POST.get('talla', '39')
 
-    # 2. Capturamos la foto exacta seleccionada
+    # 2. Capturamos la foto exacta seleccionada (aseguramos None si llega cadena vacía)
     imagen_id = request.POST.get('imagen_id')
+    if not imagen_id:
+        imagen_id = None
 
-    # 3. Cantidad
-    cantidad = int(request.POST.get('cantidad', 1))
+    # 3. Cantidad solicitada
+    try:
+        cantidad = int(request.POST.get('cantidad', 1))
+    except (ValueError, TypeError):
+        cantidad = 1
 
-    # Pasamos las nuevas variables al Carrito en lugar del variante_id
+    # Agregamos al carrito guardando la referencia exacta
     cart.add(producto_id=producto_id, talla=talla, imagen_id=imagen_id, cantidad=cantidad)
 
     return redirect('tienda:detalle_carrito')
@@ -74,7 +76,6 @@ def checkout(request):
         return redirect('tienda:catalogo')
 
     if request.method == 'POST':
-        # Aquí guardarás la orden en la base de datos
         cart.clear()
         return render(request, 'tienda/confirmacion.html')
 
