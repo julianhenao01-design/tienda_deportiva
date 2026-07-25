@@ -16,8 +16,9 @@ class MarcaAdmin(admin.ModelAdmin):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'marca', 'precio_regular', 'precio_oferta', 'agotado')
-    list_filter = ('marca', 'agotado')
+    # Se remueve 'agotado' de list_display y list_filter
+    list_display = ('nombre', 'marca', 'precio_regular', 'precio_oferta')
+    list_filter = ('marca',)
     search_fields = ('nombre', 'descripcion')
     prepopulated_fields = {'slug': ('nombre',)}
     inlines = [ImagenProductoInline]
@@ -32,7 +33,8 @@ class ResenaAdmin(admin.ModelAdmin):
 class ItemOrdenInline(admin.TabularInline):
     model = ItemOrden
     extra = 0
-    readonly_fields = ('precio_unitario', 'cantidad')
+    # Muestra los nuevos campos del item de orden (talla y foto seleccionada)
+    readonly_fields = ('producto', 'talla', 'imagen_seleccionada', 'precio_unitario', 'cantidad')
 
 
 @admin.register(Orden)
