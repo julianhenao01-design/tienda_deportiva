@@ -1,16 +1,10 @@
 from django.contrib import admin
-from .models import Marca, Producto, ImagenProducto, VarianteProducto, Resena, Orden, ItemOrden
+from .models import Marca, Producto, ImagenProducto, Resena, Orden, ItemOrden
 
 
 # Permitir agregar múltiples imágenes directo desde la pantalla del Producto
 class ImagenProductoInline(admin.TabularInline):
     model = ImagenProducto
-    extra = 1
-
-
-# Permitir agregar múltiples variantes (Tallas/Colores HEX) directo desde el Producto
-class VarianteProductoInline(admin.TabularInline):
-    model = VarianteProducto
     extra = 1
 
 
@@ -26,7 +20,7 @@ class ProductoAdmin(admin.ModelAdmin):
     list_filter = ('marca', 'agotado')
     search_fields = ('nombre', 'descripcion')
     prepopulated_fields = {'slug': ('nombre',)}
-    inlines = [ImagenProductoInline, VarianteProductoInline]
+    inlines = [ImagenProductoInline]
 
 
 @admin.register(Resena)
@@ -38,7 +32,7 @@ class ResenaAdmin(admin.ModelAdmin):
 class ItemOrdenInline(admin.TabularInline):
     model = ItemOrden
     extra = 0
-    readonly_fields = ('variante', 'precio_unitario', 'cantidad')
+    readonly_fields = ('precio_unitario', 'cantidad')
 
 
 @admin.register(Orden)
