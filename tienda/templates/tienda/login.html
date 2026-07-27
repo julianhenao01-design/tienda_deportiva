@@ -1,0 +1,73 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}Iniciar Sesión - DUAL SHOES{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto py-12 px-4">
+    <div class="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm">
+
+        <!-- Encabezado -->
+        <div class="text-center mb-8">
+            <span class="inline-block py-1 px-3.5 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-[11px] font-bold tracking-[0.2em] uppercase mb-3">
+                Acceso a Cuenta
+            </span>
+            <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight uppercase">
+                ¡HOLA DE NUEVO!
+            </h1>
+            <p class="text-slate-500 text-xs font-medium mt-1">
+                Ingresa tus credenciales para continuar
+            </p>
+        </div>
+
+        <!-- Alerta de Errores -->
+        {% if form.errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold p-4 rounded-2xl mb-6 flex items-center gap-2">
+            <span>⚠️</span> Usuario o contraseña incorrectos. Por favor verifica tus datos.
+        </div>
+        {% endif %}
+
+        <!-- Formulario de Login -->
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label for="id_username" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                    Usuario
+                </label>
+                <input type="text" name="username" id="id_username" required autofocus
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-sm font-medium transition-all"
+                       placeholder="Ingresa tu usuario">
+            </div>
+
+            <div>
+                <label for="id_password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                    Contraseña
+                </label>
+                <input type="password" name="password" id="id_password" required
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-sm font-medium transition-all"
+                       placeholder="••••••••">
+            </div>
+
+            {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
+
+            <button type="submit"
+                    class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-xs bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg transition-all duration-200 active:scale-95 mt-2">
+                Iniciar Sesión 🚀
+            </button>
+        </form>
+
+        <!-- Pie del Formulario -->
+        <div class="mt-8 border-t border-slate-100 pt-6 text-center">
+            <p class="text-xs text-slate-500 font-medium">
+                ¿Aún no te decides?
+                <a href="{% url 'tienda:catalogo' %}" class="font-bold text-slate-900 hover:underline ml-1">
+                    Explorar Catálogo
+                </a>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
