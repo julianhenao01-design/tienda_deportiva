@@ -16,12 +16,13 @@ class Cart:
         item_key = f"{producto_id}_{talla}_{img_id_str}"
 
         if item_key not in self.cart:
-            producto = Producto.objects.get(id=producto_id)
+            try:
+                producto = Producto.objects.get(id=producto_id)
+            except Producto.DoesNotExist:
+                return  # Si el producto no existe en BD, cancelamos silenciosamente
 
-            # Obtenemos el precio actual o el precio regular como respaldo
-            precio_val = getattr(producto, 'precio_actual', getattr(producto, 'precio_oferta', producto.precio_regular))
-            if not precio_val:
-                precio_val = producto.precio_regular
+            # Obtenemos el precio en oferta o regular
+            precio_val = getattr(producto, 'precio_oferta', None) or producto.precio_regular
 
             self.cart[item_key] = {
                 'producto_id': producto_id,
@@ -43,10 +44,26 @@ class Cart:
         self.session.modified = True
 
     def __iter__(self):
-        for item_key, item in self.cart.items():
-            producto = Producto.objects.get(id=item['producto_id'])
+        # 1. Obtenemos todos los IDs de productos que hay en la sesión
+        product_ids = [item['producto_id'] for item in self.cart.values()]
 
-            # Recuperamos la imagen específica que escogió el usuario
+        # 2. Consultamos la base de datos de una sola vez en bloque (in_bulk)
+        productos = Producto.objects.in_bulk(product_ids)
+
+        keys_to_remove = []
+
+        # 3. Recorremos el carrito verificando existencia
+        for item_key, item in list(self.cart.items()):
+            producto_id = item['producto_id']
+
+            # Si el producto fue eliminado del panel Admin, marcamos la clave para borrarla de la sesión
+            if producto_id not in productos:
+                keys_to_remove.append(item_key)
+                continue
+
+            producto = productos[producto_id]
+
+            # Recuperamos la imagen específica
             imagen_seleccionada = None
             imagen_id = item.get('imagen_id')
 
@@ -74,8 +91,15 @@ class Cart:
                 'total_precio': precio * item['cantidad']
             }
 
+        # 4. Limpiamos automáticamente la sesión si había productos huérfanos
+        if keys_to_remove:
+            for key in keys_to_remove:
+                del self.cart[key]
+            self.save()
+
     def get_total_price(self):
-        return sum(Decimal(item['precio']) * item['cantidad'] for item in self.cart.values())
+        # Calcula el total iterando directamente sobre los ítems válidos
+        return sum(item['total_precio'] for item in self)
 
     def __len__(self):
         return sum(item['cantidad'] for item in self.cart.values())
