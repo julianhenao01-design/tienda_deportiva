@@ -90,17 +90,17 @@
                         {% if user.is_staff or user.is_superuser %}
                         <div class="border-t border-slate-100 my-1"></div>
                         <a href="/admin/" class="block px-4 py-2.5 text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-between">
-                                    <span class="flex items-center gap-2">
-                                        <span>⚡</span> Panel Admin
-                                    </span>
+                            <span class="flex items-center gap-2">
+                                <span>⚡</span> Panel Admin
+                            </span>
                             <span class="bg-indigo-100 text-indigo-800 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Staff</span>
                         </a>
                         {% endif %}
 
                         <div class="border-t border-slate-100 my-1"></div>
 
-                        <!-- Cerrar Sesión -->
-                        <form action="{% url 'logout' %}" method="post" class="m-0">
+                        <!-- Cerrar Sesión (Con namespace 'tienda:') -->
+                        <form action="{% url 'tienda:logout' %}" method="post" class="m-0">
                             {% csrf_token %}
                             <button type="submit" class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
                                 <span>🚪</span> Cerrar Sesión
@@ -110,8 +110,8 @@
                 </div>
             </div>
             {% else %}
-            <!-- Botón para Usuarios No Logueados -->
-            <a href="{% url 'login' %}" class="px-5 py-2.5 rounded-full text-xs uppercase tracking-wider font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2">
+            <!-- Botón para Usuarios No Logueados (Con namespace 'tienda:') -->
+            <a href="{% url 'tienda:login' %}" class="px-5 py-2.5 rounded-full text-xs uppercase tracking-wider font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                 </svg>
