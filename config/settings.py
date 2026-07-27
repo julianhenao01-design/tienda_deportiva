@@ -89,7 +89,12 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Carrito de Compras
 CART_SESSION_ID = 'carrito_compras'
+
+# Redirecciones de Autenticación 🔐
+LOGIN_REDIRECT_URL = 'tienda:inicio'
+LOGOUT_REDIRECT_URL = 'tienda:inicio'
 
 # ==============================================================================
 # CONFIGURACIÓN DEL PANEL DE ADMINISTRACIÓN (DJANGO UNFOLD)
