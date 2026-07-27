@@ -34,7 +34,7 @@ def detalle_producto(request, slug):
     # Imagen principal o primera como inicial
     imagen_inicial = producto.imagenes.filter(es_principal=True).first() or producto.imagenes.first()
 
-    return render(request, 'tienda/detalle_producto.html', {
+    return render(request, 'tienda/detalle.html', {  # <-- Corregido a 'tienda/detalle.html'
         'producto': producto,
         'imagenes': imagenes,
         'imagen_inicial': imagen_inicial,
