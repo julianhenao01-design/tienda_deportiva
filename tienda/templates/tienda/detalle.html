@@ -8,8 +8,8 @@
     <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-            <!-- COLUMNA IZQUIERDA: GALERÍA Y VISOR PRINCIPAL -->
-            <div class="lg:col-span-7 space-y-5">
+            <!-- COLUMNA IZQUIERDA: VISOR PRINCIPAL Y GALERÍA COMPLETA -->
+            <div class="lg:col-span-7 space-y-4">
                 {% if producto.imagenes.all %}
                 <!-- Visor Principal de Foto -->
                 <div class="bg-[#F6F6F6] rounded-2xl p-6 flex items-center justify-center min-h-[380px] md:min-h-[460px] relative overflow-hidden group">
@@ -19,34 +19,16 @@
                          class="max-h-[400px] w-full object-contain transition-all duration-300 transform group-hover:scale-105">
                 </div>
 
-                <!-- SELECTOR VISUAL DE COLORES / ESTILOS -->
-                <div>
-                    <!-- Indicador del Nombre del Color Seleccionado -->
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">
-                            Color seleccionado:
-                            <strong id="color-label" class="text-slate-900 font-extrabold">
-                                {{ imagen_inicial.color_nombre|default:"Único / Estándar" }}
-                            </strong>
-                        </span>
+                <!-- Galería de fotos / Muestras adicionales -->
+                <div class="flex gap-2.5 overflow-x-auto pb-2 custom-scrollbar justify-start">
+                    {% for img in producto.imagenes.all %}
+                    <div class="w-20 h-20 bg-[#F6F6F6] rounded-xl border border-slate-200 p-1 flex-shrink-0">
+                        <img src="{{ img.imagen.url }}" class="w-full h-full object-contain rounded-lg">
                     </div>
-
-                    <!-- Miniaturas / Carrusel de Selección -->
-                    <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar justify-start">
-                        {% for img in producto.imagenes.all %}
-                        <button type="button"
-                                data-img-id="{{ img.id }}"
-                                data-color-nombre="{{ img.color_nombre|default:'' }}"
-                                onclick="seleccionarImagen(this, '{{ img.imagen.url }}');"
-                                class="thumb-btn w-20 h-20 bg-[#F6F6F6] rounded-xl border-2 {% if img.id == imagen_inicial.id %}border-slate-900 shadow-sm{% else %}border-transparent hover:border-slate-300{% endif %} p-1.5 flex-shrink-0 transition-all duration-200 group relative">
-                            <img src="{{ img.imagen.url }}" class="w-full h-full object-contain rounded-lg">
-                        </button>
-                        {% endfor %}
-                    </div>
+                    {% endfor %}
                 </div>
 
                 {% elif producto.imagen_principal %}
-                <!-- Caso alternativo: Imagen Principal sin lista de fotos -->
                 <div class="bg-[#F6F6F6] rounded-2xl p-6 flex items-center justify-center min-h-[380px] md:min-h-[460px]">
                     <img src="{{ producto.imagen_principal.url }}"
                          alt="{{ producto.nombre }}"
@@ -59,7 +41,7 @@
                 {% endif %}
             </div>
 
-            <!-- COLUMNA DERECHA: INFORMACIÓN Y TALLAS -->
+            <!-- COLUMNA DERECHA: INFORMACIÓN, TALLAS Y SELECCIÓN DE COLOR -->
             <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
                 <div>
                     <!-- Título y Precio -->
@@ -67,7 +49,7 @@
                         {{ producto.nombre }}
                     </h1>
 
-                    <div class="flex items-baseline gap-3 mb-8">
+                    <div class="flex items-baseline gap-3 mb-6">
                         {% if producto.precio_oferta %}
                         <span class="text-2xl font-black text-slate-900">$ {{ producto.precio_oferta|floatformat:0|intcomma }} COP</span>
                         <span class="text-lg font-bold text-slate-400 line-through">$ {{ producto.precio_regular|floatformat:0|intcomma }} COP</span>
@@ -80,15 +62,15 @@
                     <form action="{% url 'tienda:agregar_al_carrito' producto.id %}" method="POST" id="form-carrito" class="space-y-6">
                         {% csrf_token %}
 
-                        <!-- Inputs Ocultos enviando Talla y la Foto exacta al Backend -->
+                        <!-- Inputs Ocultos -->
                         <input type="hidden" name="talla" id="talla_input" value="39">
                         {% if producto.imagenes.all %}
                         <input type="hidden" name="imagen_id" id="imagen_id_input" value="{{ imagen_inicial.id }}">
                         {% endif %}
 
-                        <!-- SELECTOR DE TALLA -->
+                        <!-- 1. SELECTOR DE TALLA -->
                         <div>
-                            <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center justify-between mb-3">
                                 <label class="font-bold text-slate-900 text-xs uppercase tracking-wider">
                                     Selecciona tu Talla
                                 </label>
@@ -101,7 +83,6 @@
                                 <button type="button" data-talla="36" class="btn-talla border border-slate-200 bg-white rounded-xl py-3 text-xs font-bold text-slate-900 hover:border-slate-900 transition-all">36</button>
                                 <button type="button" data-talla="37" class="btn-talla border border-slate-200 bg-white rounded-xl py-3 text-xs font-bold text-slate-900 hover:border-slate-900 transition-all">37</button>
                                 <button type="button" data-talla="38" class="btn-talla border border-slate-200 bg-white rounded-xl py-3 text-xs font-bold text-slate-900 hover:border-slate-900 transition-all">38</button>
-                                <!-- Talla 39 preseleccionada -->
                                 <button type="button" data-talla="39" class="btn-talla border-2 border-slate-900 bg-white rounded-xl py-3 text-xs font-black text-slate-900 shadow-sm transition-all">39</button>
                                 <button type="button" data-talla="40" class="btn-talla border border-slate-200 bg-white rounded-xl py-3 text-xs font-bold text-slate-900 hover:border-slate-900 transition-all">40</button>
                                 <button type="button" data-talla="41" class="btn-talla border border-slate-200 bg-white rounded-xl py-3 text-xs font-bold text-slate-900 hover:border-slate-900 transition-all">41</button>
@@ -111,7 +92,33 @@
                             </div>
                         </div>
 
-                        <!-- SELECTOR DE CANTIDAD -->
+                        <!-- 2. SELECTOR DE COLOR (Ubicado JUSTO DEBAJO de las tallas) -->
+                        {% if producto.imagenes.all %}
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <label class="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                                    Colores Disponibles
+                                </label>
+                                <span id="color-label" class="text-xs font-extrabold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md">
+                                    {{ imagen_inicial.color_nombre|default:"Estándar" }}
+                                </span>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2.5">
+                                {% for img in producto.imagenes.all %}
+                                <button type="button"
+                                        data-img-id="{{ img.id }}"
+                                        data-color-nombre="{{ img.color_nombre|default:'' }}"
+                                        onclick="seleccionarImagen(this, '{{ img.imagen.url }}');"
+                                        class="thumb-btn w-16 h-16 bg-[#F6F6F6] rounded-xl border-2 {% if img.id == imagen_inicial.id %}border-slate-900 shadow-sm{% else %}border-transparent hover:border-slate-300{% endif %} p-1 transition-all duration-200">
+                                    <img src="{{ img.imagen.url }}" class="w-full h-full object-contain rounded-lg">
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- 3. SELECTOR DE CANTIDAD -->
                         <div>
                             <label class="font-bold text-slate-900 text-xs uppercase tracking-wider block mb-3">
                                 Cantidad
@@ -123,7 +130,7 @@
                             </div>
                         </div>
 
-                        <!-- Banner Crédito Addi -->
+                        <!-- Banner Addi -->
                         <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-[#111827] text-white font-black text-xs flex items-center justify-center flex-shrink-0">
                                 A
@@ -158,7 +165,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- LÓGICA DE SELECCIÓN DE TALLA ---
+        // --- SELECCIÓN DE TALLA ---
         const botonesTalla = document.querySelectorAll('.btn-talla');
         const inputTalla = document.getElementById('talla_input');
 
@@ -176,7 +183,7 @@
             });
         });
 
-        // --- LÓGICA DE CANTIDAD ---
+        // --- CANTIDAD ---
         const btnDisminuir = document.getElementById('btn-disminuir');
         const btnAumentar = document.getElementById('btn-aumentar');
         const cantidadInput = document.getElementById('cantidad_input');
@@ -198,15 +205,15 @@
         }
     });
 
-    // --- LÓGICA DE SELECCIÓN DE IMAGEN / COLOR ---
+    // --- SELECCIÓN DE COLOR / IMAGEN ---
     function seleccionarImagen(btn, url) {
-        // 1. Cambia la imagen principal en el visor
+        // 1. Cambiar la foto principal en el visor izquierdo
         const mainImage = document.getElementById('main-image');
         if (mainImage) {
             mainImage.src = url;
         }
 
-        // 2. Destaca borde en la miniatura seleccionada
+        // 2. Resaltar miniatura activa
         document.querySelectorAll('.thumb-btn').forEach(b => {
             b.classList.remove('border-slate-900', 'shadow-sm');
             b.classList.add('border-transparent');
@@ -215,18 +222,18 @@
         btn.classList.remove('border-transparent');
         btn.classList.add('border-slate-900', 'shadow-sm');
 
-        // 3. Actualiza el ID de la foto en el input oculto que va al backend
+        // 3. Pasar el ID al input oculto del formulario
         const imgId = btn.getAttribute('data-img-id');
         const imagenInput = document.getElementById('imagen_id_input');
         if (imagenInput) {
             imagenInput.value = imgId;
         }
 
-        // 4. Actualiza la etiqueta del nombre del color
+        // 4. Actualizar el nombre del color
         const colorNombre = btn.getAttribute('data-color-nombre');
         const colorLabel = document.getElementById('color-label');
         if (colorLabel) {
-            colorLabel.textContent = colorNombre ? colorNombre : 'Único / Estándar';
+            colorLabel.textContent = colorNombre ? colorNombre : 'Estándar';
         }
     }
 </script>

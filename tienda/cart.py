@@ -63,7 +63,7 @@ class Cart:
 
             producto = productos[producto_id]
 
-            # Recuperamos la imagen específica
+            # Recuperamos la imagen específica y su color
             imagen_seleccionada = None
             imagen_id = item.get('imagen_id')
 
@@ -80,11 +80,17 @@ class Cart:
                 elif hasattr(producto, 'imagenes') and producto.imagenes.exists():
                     imagen_seleccionada = producto.imagenes.first()
 
+            # Extraemos el nombre del color de forma segura
+            color_nombre = None
+            if imagen_seleccionada and hasattr(imagen_seleccionada, 'color_nombre'):
+                color_nombre = imagen_seleccionada.color_nombre
+
             precio = Decimal(item['precio'])
             yield {
                 'key': item_key,
                 'producto': producto,
                 'talla': item['talla'],
+                'color': color_nombre,  # <-- ¡NUEVO! Obtenemos el nombre del color
                 'imagen_seleccionada': imagen_seleccionada,
                 'precio': precio,
                 'cantidad': item['cantidad'],

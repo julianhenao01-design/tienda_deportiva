@@ -23,7 +23,7 @@
             {% for item in cart %}
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center gap-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300">
 
-                <!-- Imagen exacta del producto seleccionada por el usuario -->
+                <!-- Imagen exacta del producto elegida por el usuario -->
                 <div class="w-28 h-28 bg-slate-50 rounded-xl border border-slate-200 flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
                     {% if item.imagen_seleccionada and item.imagen_seleccionada.imagen %}
                     <img src="{{ item.imagen_seleccionada.imagen.url }}" alt="{{ item.producto.nombre }}" class="w-full h-full object-contain rounded-lg">
@@ -34,11 +34,25 @@
                     {% endif %}
                 </div>
 
-                <!-- Info del producto -->
+                <!-- Info del producto con Talla y Color -->
                 <div class="flex-grow text-center md:text-left">
-                    <h3 class="text-xl font-bold text-slate-900 tracking-tight">{{ item.producto.nombre }}</h3>
-                    <p class="text-slate-600 text-sm font-semibold mt-1">Talla: <span class="text-slate-900">{{ item.talla }}</span></p>
-                    <p class="text-slate-500 text-sm mt-1">Cantidad: <span class="font-bold text-slate-800">{{ item.cantidad }}</span></p>
+                    <h3 class="text-xl font-bold text-slate-900 tracking-tight uppercase">{{ item.producto.nombre }}</h3>
+
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
+                        <span class="text-slate-600 text-xs font-semibold bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md">
+                            Talla: <strong class="text-slate-900">{{ item.talla }}</strong>
+                        </span>
+
+                        {% if item.color %}
+                        <span class="text-slate-600 text-xs font-semibold bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md">
+                            Color: <strong class="text-slate-900">{{ item.color }}</strong>
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <p class="text-slate-500 text-xs mt-2.5 font-medium">
+                        Cantidad: <span class="font-bold text-slate-800">{{ item.cantidad }}</span>
+                    </p>
                 </div>
 
                 <!-- Precio y Botón Eliminar -->
@@ -53,7 +67,7 @@
             {% endfor %}
         </div>
 
-        <!-- Resumen de Compra (Ocupa 1 columna) -->
+        <!-- Resumen de Compra -->
         <div class="bg-white border border-slate-200 rounded-3xl p-6 h-fit shadow-sm">
             <h2 class="text-base font-black text-slate-900 uppercase tracking-wider mb-6 border-b border-slate-100 pb-4">Resumen del Pedido</h2>
 
@@ -73,7 +87,7 @@
                 </span>
             </div>
 
-            <!-- Botón de Proceder al Pago conectado a la vista checkout -->
+            <!-- Botón de Proceder al Pago -->
             <a href="{% url 'tienda:checkout' %}" class="block text-center w-full py-4 rounded-xl font-bold uppercase tracking-wider text-xs bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg transition-all duration-200 active:scale-95">
                 Proceder al Pago 🚀
             </a>

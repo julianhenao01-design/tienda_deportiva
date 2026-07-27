@@ -34,7 +34,7 @@ def detalle_producto(request, slug):
     # Imagen principal o primera como inicial
     imagen_inicial = producto.imagenes.filter(es_principal=True).first() or producto.imagenes.first()
 
-    return render(request, 'tienda/detalle.html', {  # <-- Corregido a 'tienda/detalle.html'
+    return render(request, 'tienda/detalle.html', {
         'producto': producto,
         'imagenes': imagenes,
         'imagen_inicial': imagen_inicial,
@@ -51,10 +51,10 @@ def detalle_carrito(request):
 def agregar_al_carrito(request, producto_id):
     cart = Cart(request)
 
-    # 1. Capturamos la talla (39 por defecto si no viene)
+    # 1. Capturamos la talla
     talla = request.POST.get('talla', '39')
 
-    # 2. Capturamos la foto exacta seleccionada (aseguramos None si llega cadena vacía)
+    # 2. Capturamos la foto exacta seleccionada
     imagen_id = request.POST.get('imagen_id')
     if not imagen_id:
         imagen_id = None
@@ -72,6 +72,7 @@ def agregar_al_carrito(request, producto_id):
 
 
 def eliminar_del_carrito(request, item_key):
+    cart = Cart(request)  # <-- ¡CORREGIDO! Faltaba inicializar la sesión del carrito
     cart.remove(item_key)
     return redirect('tienda:detalle_carrito')
 
