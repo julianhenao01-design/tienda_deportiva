@@ -18,8 +18,6 @@ class Producto(models.Model):
     precio_regular = models.DecimalField(max_digits=10, decimal_places=2)
     precio_oferta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    # ELIMINADO: video
-    # ELIMINADO: agotado (ya no lo necesitas si omites inventario)
 
     @property
     def precio_actual(self):
@@ -41,12 +39,17 @@ class Producto(models.Model):
 class ImagenProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes')
     imagen = models.ImageField(upload_to='productos/imagenes/')
+    color_nombre = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Ej: Cloud White / Core Black. Si defines un color, se mostrará como opción seleccionable."
+    )
     es_principal = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Imagen {self.id} de {self.producto.nombre}"
-
-# ELIMINADO: VarianteProducto (Se fueron los colores manuales y el stock)
+        color_str = f" - Color: {self.color_nombre}" if self.color_nombre else ""
+        return f"Imagen #{self.id} de {self.producto.nombre}{color_str}"
 
 class Resena(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='resenas')
@@ -85,8 +88,8 @@ class Orden(models.Model):
 class ItemOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items')
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    talla = models.CharField(max_length=10) # Guarda directamente el número de talla
-    imagen_seleccionada = models.ForeignKey(ImagenProducto, on_delete=models.SET_NULL, null=True) # Vincula la FOTO exacta
+    talla = models.CharField(max_length=10)
+    imagen_seleccionada = models.ForeignKey(ImagenProducto, on_delete=models.SET_NULL, null=True)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad = models.PositiveIntegerField(default=1)
 

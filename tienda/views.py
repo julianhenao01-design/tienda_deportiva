@@ -29,8 +29,15 @@ def catalogo(request, marca_slug=None):
 
 def detalle_producto(request, slug):
     producto = get_object_or_404(Producto, slug=slug)
-    return render(request, 'tienda/detalle.html', {
-        'producto': producto
+    imagenes = producto.imagenes.all()
+
+    # Imagen principal o primera como inicial
+    imagen_inicial = producto.imagenes.filter(es_principal=True).first() or producto.imagenes.first()
+
+    return render(request, 'tienda/detalle_producto.html', {
+        'producto': producto,
+        'imagenes': imagenes,
+        'imagen_inicial': imagen_inicial,
     })
 
 
@@ -65,7 +72,6 @@ def agregar_al_carrito(request, producto_id):
 
 
 def eliminar_del_carrito(request, item_key):
-    cart = Cart(request)
     cart.remove(item_key)
     return redirect('tienda:detalle_carrito')
 

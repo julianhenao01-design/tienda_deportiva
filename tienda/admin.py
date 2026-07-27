@@ -4,11 +4,11 @@ from unfold.admin import ModelAdmin, TabularInline
 from .models import Marca, Producto, ImagenProducto, Resena, Orden, ItemOrden
 
 
-# Inline para gestión de fotos con tarjetas modernas y vista previa
+# Inline para gestión de fotos con tarjetas modernas, vista previa y asignación de color
 class ImagenProductoInline(TabularInline):
     model = ImagenProducto
     extra = 1
-    fields = ('vista_previa', 'imagen', 'es_principal')
+    fields = ('vista_previa', 'imagen', 'color_nombre', 'es_principal')
     readonly_fields = ('vista_previa',)
 
     @admin.display(description="Vista Previa")
