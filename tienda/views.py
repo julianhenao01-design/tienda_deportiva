@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Producto, Marca
 from .cart import Cart
@@ -72,7 +73,7 @@ def agregar_al_carrito(request, producto_id):
 
 
 def eliminar_del_carrito(request, item_key):
-    cart = Cart(request)  # <-- ¡CORREGIDO! Faltaba inicializar la sesión del carrito
+    cart = Cart(request)
     cart.remove(item_key)
     return redirect('tienda:detalle_carrito')
 
@@ -82,8 +83,18 @@ def checkout(request):
     if len(cart) == 0:
         return redirect('tienda:catalogo')
 
+    # --- Cálculo del 10% de Descuento Extra ---
+    subtotal = cart.get_total_price()
+    descuento = subtotal * Decimal('0.10')
+    total_final = subtotal - descuento
+
     if request.method == 'POST':
         cart.clear()
         return render(request, 'tienda/confirmacion.html')
 
-    return render(request, 'tienda/checkout.html', {'cart': cart})
+    return render(request, 'tienda/checkout.html', {
+        'cart': cart,
+        'subtotal': subtotal,
+        'descuento': descuento,
+        'total_final': total_final,
+    })

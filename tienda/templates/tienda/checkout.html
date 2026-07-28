@@ -1,0 +1,116 @@
+{% extends 'tienda/base.html' %}
+{% load humanize %}
+
+{% block title %}Finalizar Compra - DUAL SHOES{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-extrabold text-slate-900 mb-8 uppercase tracking-tight">Finalizar Compra</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        <!-- COLUMNA IZQUIERDA: DATOS DE ENVÍO -->
+        <div class="lg:col-span-7">
+            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                <h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-6">Datos de Envío</h2>
+
+                <form id="checkout-form" method="POST" action="{% url 'tienda:checkout' %}" class="space-y-5">
+                    {% csrf_token %}
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nombre Completo</label>
+                        <input type="text" name="nombre_completo" required
+                               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Correo Electrónico</label>
+                            <input type="email" name="email" required
+                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Teléfono</label>
+                            <input type="tel" name="telefono" required
+                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dirección de Entrega</label>
+                        <input type="text" name="direccion" required placeholder="Ej. Calle 123 # 45-67, Apto 101"
+                               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ciudad / Municipio</label>
+                        <input type="text" name="ciudad" required
+                               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: RESUMEN DE LA ORDEN -->
+        <div class="lg:col-span-5">
+            <div class="bg-[#F6F6F6] rounded-3xl p-8 border border-slate-200 sticky top-6">
+                <h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-6">Resumen de tu pedido</h2>
+
+                <!-- Lista de Productos -->
+                <div class="space-y-4 mb-6">
+                    {% for item in cart %}
+                    <div class="flex gap-4">
+                        <div class="w-20 h-20 bg-white rounded-xl border border-slate-200 p-1.5 flex-shrink-0">
+                            {% if item.imagen_seleccionada %}
+                            <img src="{{ item.imagen_seleccionada.imagen.url }}" class="w-full h-full object-contain rounded-lg">
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 flex flex-col justify-center">
+                            <h3 class="text-sm font-bold text-slate-900 uppercase leading-tight">{{ item.producto.nombre }}</h3>
+                            <p class="text-xs text-slate-500 mt-1">
+                                Talla: <strong class="text-slate-700">{{ item.talla }}</strong>
+                                {% if item.color %} | <strong class="text-slate-700">{{ item.color }}</strong>{% endif %}
+                            </p>
+                            <p class="text-xs text-slate-500">Cant: {{ item.cantidad }}</p>
+                        </div>
+                        <div class="text-sm font-black text-slate-900 flex items-center">
+                            $ {{ item.total_precio|floatformat:0|intcomma }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Totales y Descuento -->
+                <div class="border-t border-slate-200 pt-5 space-y-3">
+                    <div class="flex justify-between items-center text-sm font-medium text-slate-600">
+                        <span>Subtotal</span>
+                        <span>$ {{ subtotal|floatformat:0|intcomma }} COP</span>
+                    </div>
+
+                    <!-- Etiqueta del 10% de descuento -->
+                    <div class="flex justify-between items-center text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
+                        <span class="flex items-center gap-1">🎟️ Descuento Especial (10%)</span>
+                        <span>- $ {{ descuento|floatformat:0|intcomma }} COP</span>
+                    </div>
+
+                    <div class="flex justify-between items-center text-lg font-black text-slate-900 pt-3 border-t border-slate-200 mt-2">
+                        <span>Total a Pagar</span>
+                        <span>$ {{ total_final|floatformat:0|intcomma }} COP</span>
+                    </div>
+                </div>
+
+                <!-- Botón de Pago -->
+                <div class="mt-8">
+                    <button type="submit" form="checkout-form"
+                            class="w-full py-4 rounded-full font-bold uppercase tracking-wider text-xs bg-slate-900 hover:bg-black text-white shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <span>🔒</span>
+                        <span>Confirmar y Finalizar Pedido</span>
+                    </button>
+                    <p class="text-center text-xs text-slate-400 mt-3 font-medium">Pago 100% seguro y encriptado.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
