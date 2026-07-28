@@ -33,6 +33,11 @@ class Producto(models.Model):
             return primera_img.imagen
         return None
 
+    # Muestra únicamente las fotos que representan una variante de color activa
+    @property
+    def opciones_color(self):
+        return self.imagenes.exclude(color_nombre__isnull=True).exclude(color_nombre='')
+
     def __str__(self):
         return f"{self.nombre} ({self.marca.nombre})"
 
@@ -43,12 +48,12 @@ class ImagenProducto(models.Model):
         max_length=100,
         blank=True,
         null=True,
-        help_text="Ej: Cloud White / Core Black. Si defines un color, se mostrará como opción seleccionable."
+        help_text="OPCIONAL: Nombre del color (ej: Verde, Negro). Llena esto SOLO si esta foto es la muestra de una variante de color en el panel derecho. Para fotos normales de la galería o ángulos, DÉJALO EN BLANCO."
     )
     es_principal = models.BooleanField(default=False)
 
     def __str__(self):
-        color_str = f" - Color: {self.color_nombre}" if self.color_nombre else ""
+        color_str = f" - Color: {self.color_nombre}" if self.color_nombre else " (Galería / Ángulo)"
         return f"Imagen #{self.id} de {self.producto.nombre}{color_str}"
 
 class Resena(models.Model):
@@ -95,3 +100,4 @@ class ItemOrden(models.Model):
 
     def __str__(self):
         return f"{self.cantidad}x {self.producto.nombre} - Talla {self.talla}"
+

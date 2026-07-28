@@ -8,7 +8,7 @@
     <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-            <!-- COLUMNA IZQUIERDA: VISOR PRINCIPAL Y GALERÍA COMPLETA -->
+            <!-- COLUMNA IZQUIERDA: VISOR PRINCIPAL Y GALERÍA DE ÁNGULOS -->
             <div class="lg:col-span-7 space-y-4">
                 {% if producto.imagenes.all %}
                 <!-- Visor Principal de Foto -->
@@ -19,12 +19,14 @@
                          class="max-h-[400px] w-full object-contain transition-all duration-300 transform group-hover:scale-105">
                 </div>
 
-                <!-- Galería de fotos / Muestras adicionales -->
+                <!-- Galería de fotos (Todas las fotos / ángulos para explorar) -->
                 <div class="flex gap-2.5 overflow-x-auto pb-2 custom-scrollbar justify-start">
                     {% for img in producto.imagenes.all %}
-                    <div class="w-20 h-20 bg-[#F6F6F6] rounded-xl border border-slate-200 p-1 flex-shrink-0">
+                    <button type="button"
+                            onclick="cambiarImagenVisor('{{ img.imagen.url }}');"
+                            class="w-20 h-20 bg-[#F6F6F6] rounded-xl border border-slate-200 hover:border-slate-900 p-1 flex-shrink-0 transition-all duration-200 focus:outline-none">
                         <img src="{{ img.imagen.url }}" class="w-full h-full object-contain rounded-lg">
-                    </div>
+                    </button>
                     {% endfor %}
                 </div>
 
@@ -92,8 +94,8 @@
                             </div>
                         </div>
 
-                        <!-- 2. SELECTOR DE COLOR (Ubicado JUSTO DEBAJO de las tallas) -->
-                        {% if producto.imagenes.all %}
+                        <!-- 2. SELECTOR DE COLOR (Aplica producto.opciones_color) -->
+                        {% if producto.opciones_color %}
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <label class="font-bold text-slate-900 text-xs uppercase tracking-wider">
@@ -105,7 +107,7 @@
                             </div>
 
                             <div class="flex flex-wrap gap-2.5">
-                                {% for img in producto.imagenes.all %}
+                                {% for img in producto.opciones_color %}
                                 <button type="button"
                                         data-img-id="{{ img.id }}"
                                         data-color-nombre="{{ img.color_nombre|default:'' }}"
@@ -205,15 +207,20 @@
         }
     });
 
-    // --- SELECCIÓN DE COLOR / IMAGEN ---
-    function seleccionarImagen(btn, url) {
-        // 1. Cambiar la foto principal en el visor izquierdo
+    // --- CAMBIAR VISOR CON GALERÍA IZQUIERDA ---
+    function cambiarImagenVisor(url) {
         const mainImage = document.getElementById('main-image');
         if (mainImage) {
             mainImage.src = url;
         }
+    }
 
-        // 2. Resaltar miniatura activa
+    // --- SELECCIÓN DE COLOR / VARIANTE ---
+    function seleccionarImagen(btn, url) {
+        // 1. Cambiar la foto principal en el visor izquierdo
+        cambiarImagenVisor(url);
+
+        // 2. Resaltar la miniatura de color activa
         document.querySelectorAll('.thumb-btn').forEach(b => {
             b.classList.remove('border-slate-900', 'shadow-sm');
             b.classList.add('border-transparent');
@@ -238,3 +245,4 @@
     }
 </script>
 {% endblock %}
+
