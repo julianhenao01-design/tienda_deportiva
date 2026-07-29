@@ -14,6 +14,7 @@ urlpatterns = [
     # Carrito de Compras 🛒
     path('carrito/', views.detalle_carrito, name='detalle_carrito'),
     path('carrito/agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+    path('carrito/actualizar/<str:item_key>/', views.actualizar_cantidad_carrito, name='actualizar_cantidad_carrito'),
     path('carrito/eliminar/<str:item_key>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
 
     # Proceso de Pago 💳

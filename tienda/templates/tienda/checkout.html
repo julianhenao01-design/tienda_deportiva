@@ -7,12 +7,23 @@
 <div class="max-w-6xl mx-auto py-10 px-4">
     <h1 class="text-3xl font-extrabold text-slate-900 mb-8 uppercase tracking-tight">Finalizar Compra</h1>
 
+    <!-- Banner de Error de Validación (si se activa desde views.py) -->
+    {% if error %}
+    <div class="mb-8 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium flex items-center gap-3 shadow-sm">
+        <span class="text-lg">⚠️</span>
+        <div>{{ error }}</div>
+    </div>
+    {% endif %}
+
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
         <!-- COLUMNA IZQUIERDA: DATOS DE ENVÍO -->
         <div class="lg:col-span-7">
             <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                <h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-6">Datos de Envío</h2>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider">1. Datos de Envío y Contacto</h2>
+                    <span class="text-[10px] bg-slate-100 text-slate-600 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Paso Final</span>
+                </div>
 
                 <form id="checkout-form" method="POST" action="{% url 'tienda:checkout' %}" class="space-y-5">
                     {% csrf_token %}
@@ -20,32 +31,52 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nombre Completo</label>
                         <input type="text" name="nombre_completo" required
-                               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                               value="{{ request.POST.nombre_completo|default:'' }}"
+                               placeholder="Ej. Juan Pérez"
+                               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Correo Electrónico</label>
                             <input type="email" name="email" required
-                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                                   value="{{ request.POST.email|default:'' }}"
+                                   placeholder="tu@email.com"
+                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Teléfono</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Teléfono / WhatsApp</label>
                             <input type="tel" name="telefono" required
-                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                                   value="{{ request.POST.telefono|default:'' }}"
+                                   placeholder="Ej. 300 123 4567"
+                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all">
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dirección de Entrega</label>
-                        <input type="text" name="direccion" required placeholder="Ej. Calle 123 # 45-67, Apto 101"
-                               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ciudad / Municipio</label>
+                            <input type="text" name="ciudad" required
+                                   value="{{ request.POST.ciudad|default:'' }}"
+                                   placeholder="Ej. Cali, Bogotá, Medellín..."
+                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dirección de Entrega</label>
+                            <input type="text" name="direccion" required
+                                   value="{{ request.POST.direccion|default:'' }}"
+                                   placeholder="Ej. Calle 123 # 45-67, Apto 101"
+                                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ciudad / Municipio</label>
-                        <input type="text" name="ciudad" required
-                               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-all">
+                    <!-- Garantía de Despacho -->
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-3 mt-4">
+                        <span class="text-xl">🚚</span>
+                        <div class="text-xs text-slate-600 leading-relaxed">
+                            <strong class="text-slate-900 block font-bold mb-0.5">Envío Promocional Incluido</strong>
+                            Despachamos tu pedido en las siguientes 24 horas hábiles. Te enviaremos el código de guía directo a tu WhatsApp.
+                        </div>
                     </div>
                 </form>
             </div>
@@ -57,23 +88,25 @@
                 <h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-6">Resumen de tu pedido</h2>
 
                 <!-- Lista de Productos -->
-                <div class="space-y-4 mb-6">
+                <div class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1">
                     {% for item in cart %}
-                    <div class="flex gap-4">
-                        <div class="w-20 h-20 bg-white rounded-xl border border-slate-200 p-1.5 flex-shrink-0">
+                    <div class="flex gap-4 items-center bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                        <div class="w-16 h-16 bg-slate-50 rounded-xl border border-slate-100 p-1 flex-shrink-0 flex items-center justify-center">
                             {% if item.imagen_seleccionada %}
-                            <img src="{{ item.imagen_seleccionada.imagen.url }}" class="w-full h-full object-contain rounded-lg">
+                            <img src="{{ item.imagen_seleccionada.imagen.url }}" alt="{{ item.producto.nombre }}" class="w-full h-full object-contain rounded-lg">
+                            {% else %}
+                            <span class="text-xl">👟</span>
                             {% endif %}
                         </div>
-                        <div class="flex-1 flex flex-col justify-center">
-                            <h3 class="text-sm font-bold text-slate-900 uppercase leading-tight">{{ item.producto.nombre }}</h3>
-                            <p class="text-xs text-slate-500 mt-1">
-                                Talla: <strong class="text-slate-700">{{ item.talla }}</strong>
-                                {% if item.color %} | <strong class="text-slate-700">{{ item.color }}</strong>{% endif %}
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-xs font-bold text-slate-900 uppercase truncate leading-tight">{{ item.producto.nombre }}</h3>
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Talla: <strong class="text-slate-800">{{ item.talla }}</strong>
+                                {% if item.color %} | <strong class="text-slate-800">{{ item.color }}</strong>{% endif %}
                             </p>
-                            <p class="text-xs text-slate-500">Cant: {{ item.cantidad }}</p>
+                            <p class="text-[11px] text-slate-400">Cant: {{ item.cantidad }}</p>
                         </div>
-                        <div class="text-sm font-black text-slate-900 flex items-center">
+                        <div class="text-xs font-black text-slate-900 flex-shrink-0">
                             $ {{ item.total_precio|floatformat:0|intcomma }}
                         </div>
                     </div>
@@ -88,7 +121,7 @@
                     </div>
 
                     <!-- Etiqueta del 10% de descuento -->
-                    <div class="flex justify-between items-center text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
+                    <div class="flex justify-between items-center text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-100">
                         <span class="flex items-center gap-1">🎟️ Descuento Especial (10%)</span>
                         <span>- $ {{ descuento|floatformat:0|intcomma }} COP</span>
                     </div>
@@ -101,16 +134,29 @@
 
                 <!-- Botón de Pago -->
                 <div class="mt-8">
-                    <button type="submit" form="checkout-form"
+                    <button type="submit" form="checkout-form" id="btn-submit-order"
                             class="w-full py-4 rounded-full font-bold uppercase tracking-wider text-xs bg-slate-900 hover:bg-black text-white shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
                         <span>🔒</span>
-                        <span>Confirmar y Finalizar Pedido</span>
+                        <span id="btn-text">Confirmar y Finalizar Pedido</span>
                     </button>
-                    <p class="text-center text-xs text-slate-400 mt-3 font-medium">Pago 100% seguro y encriptado.</p>
+                    <p class="text-center text-[11px] text-slate-400 mt-3 font-medium">Procesamiento seguro y garantía directa DUAL SHOES.</p>
                 </div>
             </div>
         </div>
 
     </div>
 </div>
+
+<script>
+    // Evita envíos dobles si el cliente hace clic rápido varias veces
+    document.getElementById('checkout-form').addEventListener('submit', function() {
+        const btn = document.getElementById('btn-submit-order');
+        const btnText = document.getElementById('btn-text');
+
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        btnText.textContent = 'Procesando pedido...';
+    });
+</script>
 {% endblock %}
+
