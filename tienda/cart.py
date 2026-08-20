@@ -35,6 +35,15 @@ class Cart:
         self.cart[item_key]['cantidad'] += cantidad
         self.save()
 
+    def update_quantity(self, item_key, cantidad):
+        """Actualiza la cantidad de un ítem existente en el carrito."""
+        if item_key in self.cart:
+            if cantidad > 0:
+                self.cart[item_key]['cantidad'] = cantidad
+            else:
+                del self.cart[item_key]
+            self.save()
+
     def remove(self, item_key):
         if item_key in self.cart:
             del self.cart[item_key]
@@ -90,7 +99,7 @@ class Cart:
                 'key': item_key,
                 'producto': producto,
                 'talla': item['talla'],
-                'color': color_nombre,  # <-- ¡NUEVO! Obtenemos el nombre del color
+                'color': color_nombre,
                 'imagen_seleccionada': imagen_seleccionada,
                 'precio': precio,
                 'cantidad': item['cantidad'],
@@ -104,7 +113,6 @@ class Cart:
             self.save()
 
     def get_total_price(self):
-        # Calcula el total iterando directamente sobre los ítems válidos
         return sum(item['total_precio'] for item in self)
 
     def __len__(self):

@@ -3,8 +3,6 @@ from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.contrib import messages
-from django.core.paginator import Paginator
-from django.db.models import Q
 
 from .models import Producto, Marca, ImagenProducto, Orden, ItemOrden
 from .cart import Cart
@@ -16,22 +14,36 @@ NUMERO_WHATSAPP_TIENDA = "3058606365"
 # --- PÁGINAS PRINCIPALES ---
 
 def inicio(request):
-    productos = Producto.objects.all()[:8]
-    return render(request, 'tienda/index.html', {'productos': productos})
+    marcas = Marca.objects.all()
+    return render(request, 'tienda/inicio.html', {'marcas': marcas})
 
 
 def catalogo(request, marca_slug=None):
-    productos = Producto.objects.all()
-    marca = None
+    productos = Producto.objects.filter(activo=True)
+    marcas = Marca.objects.all()
+    marca_seleccionada = None
+
     if marca_slug:
-        marca = get_object_or_404(Marca, slug=marca_slug)
-        productos = productos.filter(marca=marca)
-    return render(request, 'tienda/catalogo.html', {'productos': productos, 'marca': marca})
+        marca_seleccionada = get_object_or_404(Marca, slug=marca_slug)
+        productos = productos.filter(marca=marca_seleccionada)
+
+    return render(request, 'tienda/catalogo.html', {
+        'productos': productos,
+        'marcas': marcas,
+        'marca_seleccionada': marca_seleccionada
+    })
 
 
 def detalle_producto(request, slug):
-    producto = get_object_or_404(Producto, slug=slug)
-    return render(request, 'tienda/detalle_producto.html', {'producto': producto})
+    producto = get_object_or_404(Producto, slug=slug, activo=True)
+
+    # Obtenemos la foto principal o la primera foto disponible para el visor inicial
+    imagen_inicial = producto.imagenes.filter(es_principal=True).first() or producto.imagenes.first()
+
+    return render(request, 'tienda/detalle_producto.html', {
+        'producto': producto,
+        'imagen_inicial': imagen_inicial
+    })
 
 
 # --- CARRITO DE COMPRAS 🛒 ---
@@ -44,15 +56,30 @@ def detalle_carrito(request):
 def agregar_al_carrito(request, producto_id):
     cart = Cart(request)
     producto = get_object_or_404(Producto, id=producto_id)
-    talla = request.POST.get('talla', '')
+    talla = request.POST.get('talla', '39')
     imagen_id = request.POST.get('imagen_id', None)
-    cart.add(producto=producto, cantidad=1, talla=talla, imagen_id=imagen_id)
+
+    try:
+        cantidad = int(request.POST.get('cantidad', 1))
+    except (ValueError, TypeError):
+        cantidad = 1
+
+    cart.add(
+        producto_id=producto.id,
+        talla=talla,
+        imagen_id=imagen_id,
+        cantidad=cantidad
+    )
     return redirect('tienda:detalle_carrito')
 
 
 def actualizar_cantidad_carrito(request, item_key):
     cart = Cart(request)
-    cantidad = int(request.POST.get('cantidad', 1))
+    try:
+        cantidad = int(request.POST.get('cantidad', 1))
+    except (ValueError, TypeError):
+        cantidad = 1
+
     cart.update_quantity(item_key, cantidad)
     return redirect('tienda:detalle_carrito')
 
@@ -109,16 +136,14 @@ def checkout(request):
                 # 2. Guardar Ítems y armar texto de productos para WhatsApp
                 lineas_productos = []
                 for item in cart:
-                    imagen_obj = None
-                    if item.get('imagen_id'):
-                        imagen_obj = ImagenProducto.objects.filter(id=item['imagen_id']).first()
+                    imagen_obj = item.get('imagen_seleccionada')
 
                     item_orden = ItemOrden.objects.create(
                         orden=orden,
                         producto=item['producto'],
                         talla=item['talla'],
                         imagen_seleccionada=imagen_obj,
-                        precio_unitario=item['precio_unitario'],
+                        precio_unitario=item['precio'],  # Corrección de clave
                         cantidad=item['cantidad']
                     )
                     lineas_productos.append(
