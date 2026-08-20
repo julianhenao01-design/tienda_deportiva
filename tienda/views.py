@@ -10,7 +10,7 @@ from .models import Producto, Marca, ImagenProducto, Orden, ItemOrden
 from .cart import Cart
 
 # Configura aquí el número de teléfono de tu tienda (con código de país sin el +)
-NUMERO_WHATSAPP_TIENDA = "573000000000"  # Cambia esto por tu número real (ej: 573101234567)
+NUMERO_WHATSAPP_TIENDA = "3058606365"  # Cambia esto por tu número real (ej: 573101234567)
 
 
 def checkout(request):
