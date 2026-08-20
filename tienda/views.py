@@ -91,6 +91,8 @@ def eliminar_del_carrito(request, item_key):
 
 # --- PROCESO DE PAGO Y WHATSAPP 💳 ---
 
+# --- PROCESO DE PAGO Y WHATSAPP 💳 ---
+
 def checkout(request):
     cart = Cart(request)
     if len(cart) == 0:
@@ -132,7 +134,7 @@ def checkout(request):
                     estado='PENDIENTE'
                 )
 
-                # 2. Guardar Ítems y armar texto de productos para WhatsApp
+                # 2. Guardar Ítems y armar texto con enlaces a las imágenes
                 lineas_productos = []
                 for item in cart:
                     imagen_obj = item.get('imagen_seleccionada')
@@ -142,18 +144,28 @@ def checkout(request):
                         producto=item['producto'],
                         talla=item['talla'],
                         imagen_seleccionada=imagen_obj,
-                        precio_unitario=item['precio'],  # Corrección de clave
+                        precio_unitario=item['precio'],
                         cantidad=item['cantidad']
                     )
+
+                    # CONSTRUCCIÓN DE LA URL ABSOLUTA DE LA IMAGEN 📸
+                    url_imagen = ""
+                    if imagen_obj and imagen_obj.imagen:
+                        url_imagen = request.build_absolute_uri(imagen_obj.imagen.url)
+                    elif item_orden.producto.imagen_principal:
+                        url_imagen = request.build_absolute_uri(item_orden.producto.imagen_principal.url)
+
+                    texto_foto = f"\n   🖼️ Ver Foto: {url_imagen}" if url_imagen else ""
+
                     lineas_productos.append(
-                        f"• {item_orden.cantidad}x {item_orden.producto.nombre} (Talla: {item_orden.talla})"
+                        f"• {item_orden.cantidad}x {item_orden.producto.nombre} (Talla: {item_orden.talla}){texto_foto}"
                     )
 
                 # 3. Vaciar carrito de la sesión
                 cart.clear()
 
                 # 4. Construir el mensaje pre-armado para WhatsApp
-                texto_productos = "\n".join(lineas_productos)
+                texto_productos = "\n\n".join(lineas_productos)
 
                 mensaje_wa = (
                     f"👋 *¡Hola DUAL SHOES! Acabo de realizar un pedido en la tienda web.*\n\n"
