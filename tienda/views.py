@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import urllib.parse
 from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
@@ -38,7 +39,6 @@ def detalle_producto(request, slug):
     producto = get_object_or_404(Producto, slug=slug, activo=True)
     imagen_inicial = producto.imagenes.filter(es_principal=True).first() or producto.imagenes.first()
 
-    # Cambia 'tienda/detalle_producto.html' por el nombre real de tu archivo HTML
     return render(request, 'tienda/detalle.html', {
         'producto': producto,
         'imagen_inicial': imagen_inicial
@@ -88,8 +88,6 @@ def eliminar_del_carrito(request, item_key):
     cart.remove(item_key)
     return redirect('tienda:detalle_carrito')
 
-
-# --- PROCESO DE PAGO Y WHATSAPP 💳 ---
 
 # --- PROCESO DE PAGO Y WHATSAPP 💳 ---
 
@@ -179,7 +177,8 @@ def checkout(request):
                     f"Quedo atento a las instrucciones para el pago y el envío de la guía. ¡Muchas gracias!"
                 )
 
-                mensaje_encoded = urllib.parse.quote(mensaje_wa)
+                # Encodificación UTF-8 explícita para WhatsApp
+                mensaje_encoded = urllib.parse.quote(mensaje_wa.encode('utf-8'))
                 whatsapp_url = f"https://wa.me/{NUMERO_WHATSAPP_TIENDA}?text={mensaje_encoded}"
 
                 return render(request, 'tienda/confirmacion.html', {
