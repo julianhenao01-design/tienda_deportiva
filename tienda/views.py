@@ -10,8 +10,60 @@ from .models import Producto, Marca, ImagenProducto, Orden, ItemOrden
 from .cart import Cart
 
 # Configura aquí el número de teléfono de tu tienda (con código de país sin el +)
-NUMERO_WHATSAPP_TIENDA = "3058606365"  # Cambia esto por tu número real (ej: 573101234567)
+NUMERO_WHATSAPP_TIENDA = "3058606365"
 
+
+# --- PÁGINAS PRINCIPALES ---
+
+def inicio(request):
+    productos = Producto.objects.all()[:8]
+    return render(request, 'tienda/index.html', {'productos': productos})
+
+
+def catalogo(request, marca_slug=None):
+    productos = Producto.objects.all()
+    marca = None
+    if marca_slug:
+        marca = get_object_or_404(Marca, slug=marca_slug)
+        productos = productos.filter(marca=marca)
+    return render(request, 'tienda/catalogo.html', {'productos': productos, 'marca': marca})
+
+
+def detalle_producto(request, slug):
+    producto = get_object_or_404(Producto, slug=slug)
+    return render(request, 'tienda/detalle_producto.html', {'producto': producto})
+
+
+# --- CARRITO DE COMPRAS 🛒 ---
+
+def detalle_carrito(request):
+    cart = Cart(request)
+    return render(request, 'tienda/carrito.html', {'cart': cart})
+
+
+def agregar_al_carrito(request, producto_id):
+    cart = Cart(request)
+    producto = get_object_or_404(Producto, id=producto_id)
+    talla = request.POST.get('talla', '')
+    imagen_id = request.POST.get('imagen_id', None)
+    cart.add(producto=producto, cantidad=1, talla=talla, imagen_id=imagen_id)
+    return redirect('tienda:detalle_carrito')
+
+
+def actualizar_cantidad_carrito(request, item_key):
+    cart = Cart(request)
+    cantidad = int(request.POST.get('cantidad', 1))
+    cart.update_quantity(item_key, cantidad)
+    return redirect('tienda:detalle_carrito')
+
+
+def eliminar_del_carrito(request, item_key):
+    cart = Cart(request)
+    cart.remove(item_key)
+    return redirect('tienda:detalle_carrito')
+
+
+# --- PROCESO DE PAGO Y WHATSAPP 💳 ---
 
 def checkout(request):
     cart = Cart(request)
