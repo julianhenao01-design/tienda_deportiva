@@ -36,11 +36,10 @@ def catalogo(request, marca_slug=None):
 
 def detalle_producto(request, slug):
     producto = get_object_or_404(Producto, slug=slug, activo=True)
-
-    # Obtenemos la foto principal o la primera foto disponible para el visor inicial
     imagen_inicial = producto.imagenes.filter(es_principal=True).first() or producto.imagenes.first()
 
-    return render(request, 'tienda/detalle_producto.html', {
+    # Cambia 'tienda/detalle_producto.html' por el nombre real de tu archivo HTML
+    return render(request, 'tienda/detalle.html', {
         'producto': producto,
         'imagen_inicial': imagen_inicial
     })
