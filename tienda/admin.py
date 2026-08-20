@@ -54,9 +54,33 @@ class ItemOrdenInline(TabularInline):
     can_delete = False
 
 
+# --- GESTIÓN Y ACCIONES DE ESTADO DE VENTAS 📦 ---
+
 @admin.register(Orden)
 class OrdenAdmin(ModelAdmin):
-    list_display = ('id', 'nombre_completo', 'email', 'total', 'estado', 'fecha_creacion')
+    list_display = ('id', 'nombre_completo', 'telefono', 'ciudad', 'total', 'estado', 'fecha_creacion')
+    list_editable = ('estado',)  # Permite cambiar el estado directo en la tabla con un clic
     list_filter = ('estado', 'fecha_creacion')
-    search_fields = ('nombre_completo', 'email', 'id')
+    search_fields = ('nombre_completo', 'email', 'telefono', 'id')
     inlines = [ItemOrdenInline]
+    actions = ['marcar_confirmado', 'marcar_pagado', 'marcar_enviado', 'marcar_rechazado']
+
+    @admin.action(description="✅ Confirmar existencia (Listo para Pagar)")
+    def marcar_confirmado(self, request, queryset):
+        actualizados = queryset.update(estado='CONFIRMADO')
+        self.message_user(request, f"{actualizados} orden(es) marcada(s) como CONFIRMADO.")
+
+    @admin.action(description="💰 Marcar Pago Recibido (PAGADO)")
+    def marcar_pagado(self, request, queryset):
+        actualizados = queryset.update(estado='PAGADO')
+        self.message_user(request, f"{actualizados} orden(es) marcada(s) como PAGADO.")
+
+    @admin.action(description="🚚 Marcar como PEDIDO ENVIADO")
+    def marcar_enviado(self, request, queryset):
+        actualizados = queryset.update(estado='ENVIADO')
+        self.message_user(request, f"{actualizados} orden(es) marcada(s) como ENVIADO.")
+
+    @admin.action(description="❌ Marcar como RECHAZADO")
+    def marcar_rechazado(self, request, queryset):
+        actualizados = queryset.update(estado='RECHAZADO')
+        self.message_user(request, f"{actualizados} orden(es) marcada(s) como RECHAZADO.")
