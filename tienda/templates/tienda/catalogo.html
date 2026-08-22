@@ -4,24 +4,26 @@
 {% block title %}Catálogo - DUAL SHOES{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row gap-8 py-4">
+<div class="flex flex-col md:flex-row gap-6 md:gap-8 py-2 md:py-4">
 
-  <!-- Filtros laterales por Marca -->
-  <aside class="w-full md:w-1/4 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm h-fit">
-    <h3 class="font-black text-xs uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-100 pb-3 flex items-center gap-2">
-      <span>Marcas</span>
+  <!-- FILTROS POR MARCA: Carrusel horizontal en Móvil / Columna fija en Desktop -->
+  <aside class="w-full md:w-1/4 bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm h-fit">
+    <h3 class="font-black text-xs uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-100 pb-2 hidden md:block">
+      Marcas
     </h3>
-    <ul class="space-y-2">
-      <li>
+
+    <!-- Menú Deslizable Horizontal en Celulares -->
+    <ul class="flex md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0 custom-scrollbar whitespace-nowrap">
+      <li class="flex-shrink-0">
         <a href="{% url 'tienda:catalogo' %}"
-           class="block py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 {% if not marca_seleccionada %}bg-slate-900 text-white shadow-sm{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+           class="inline-block md:block py-2 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 {% if not marca_seleccionada %}bg-slate-900 text-white shadow-sm{% else %}text-slate-600 bg-slate-50 md:bg-transparent hover:bg-slate-100 hover:text-slate-900{% endif %}">
           Todas las Marcas
         </a>
       </li>
       {% for marca in marcas %}
-      <li>
+      <li class="flex-shrink-0">
         <a href="{% url 'tienda:catalogo_marca' marca.slug %}"
-           class="block py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 {% if marca_seleccionada.id == marca.id %}bg-slate-900 text-white shadow-sm{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+           class="inline-block md:block py-2 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 {% if marca_seleccionada.id == marca.id %}bg-slate-900 text-white shadow-sm{% else %}text-slate-600 bg-slate-50 md:bg-transparent hover:bg-slate-100 hover:text-slate-900{% endif %}">
           {{ marca.nombre }}
         </a>
       </li>
@@ -29,66 +31,67 @@
     </ul>
   </aside>
 
-  <!-- Lista de Productos en Grid -->
+  <!-- LISTA DE PRODUCTOS -->
   <main class="w-full md:w-3/4">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase">
+    <!-- Encabezado de Sección -->
+    <div class="flex items-center justify-between mb-4 sm:mb-6">
+      <h2 class="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase">
         {% if marca_seleccionada %}{{ marca_seleccionada.nombre }}{% else %}Colección Completa{% endif %}
       </h2>
-      <span class="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">
-        {{ productos|length }} Producto(s)
+      <span class="text-[10px] sm:text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1 sm:py-1.5 rounded-full">
+        {{ productos|length }} Tenis
       </span>
     </div>
 
-    <!-- Rejilla de Productos -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Rejilla de Productos (2 Columnas en Celular / 3 en Escritorio) -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
       {% for producto in productos %}
-      <div class="group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-slate-200/60 hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 flex flex-col justify-between">
+      <div class="group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-slate-200/60 transition-all duration-300 flex flex-col justify-between">
 
-        <!-- Contenedor Imagen Optimizado con la Propiedad del Modelo -->
-        <div class="relative overflow-hidden bg-slate-50 h-56 flex items-center justify-center p-4">
+        <!-- Contenedor Imagen Proporcional (Aspect Square para Celular) -->
+        <div class="relative overflow-hidden bg-[#F6F6F6] aspect-square w-full flex items-center justify-center p-3 sm:p-4">
           {% if producto.imagen_principal %}
           <img src="{{ producto.imagen_principal.url }}"
                alt="{{ producto.nombre }}"
+               loading="lazy"
                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out">
           {% else %}
-          <div class="text-slate-400 text-xs font-medium">Sin imagen</div>
+          <div class="text-slate-400 text-xs font-medium text-center">Sin imagen 📷</div>
           {% endif %}
 
-          <span class="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+          <span class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-slate-900 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-sm">
             {{ producto.marca.nombre }}
           </span>
         </div>
 
-        <!-- Datos del producto -->
-        <div class="p-5 flex-grow flex flex-col justify-between">
+        <!-- Información y Precio -->
+        <div class="p-3 sm:p-5 flex-grow flex flex-col justify-between">
           <div>
-            <h3 class="font-bold text-base text-slate-900 group-hover:text-slate-600 transition-colors duration-200 line-clamp-1">
+            <h3 class="font-bold text-xs sm:text-base text-slate-900 group-hover:text-slate-600 transition-colors duration-200 line-clamp-2 sm:line-clamp-1">
               {{ producto.nombre }}
             </h3>
           </div>
 
-          <div class="mt-6 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+          <div class="mt-3 sm:mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100 pt-2 sm:pt-3">
             <div>
-              <span class="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Precio</span>
-              <span class="text-lg font-black text-slate-900">$ {{ producto.precio_regular|floatformat:0|intcomma }} COP</span>
+              <span class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Precio</span>
+              <span class="text-xs sm:text-lg font-black text-slate-900">$ {{ producto.precio_regular|floatformat:0|intcomma }}</span>
             </div>
 
             <a href="{% url 'tienda:detalle_producto' producto.slug %}"
-               class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 text-white hover:bg-slate-800 transition-all duration-200 shadow-sm active:scale-95">
-              Ver Más
+               class="w-full sm:w-auto text-center px-3 py-2 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-slate-900 text-white hover:bg-slate-800 transition-all duration-200 shadow-sm active:scale-95">
+              Ver Detalle
             </a>
           </div>
         </div>
 
       </div>
       {% empty %}
-      <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-500 shadow-sm">
-        <p class="text-base font-medium">No hay tenis disponibles en esta sección por el momento.</p>
+      <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-8 sm:p-12 text-center text-slate-500 shadow-sm">
+        <p class="text-sm sm:text-base font-medium">No hay tenis disponibles en esta sección por el momento.</p>
       </div>
       {% endfor %}
     </div>
   </main>
 </div>
 {% endblock %}
-

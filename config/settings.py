@@ -96,6 +96,10 @@ CART_SESSION_ID = 'carrito_compras'
 LOGIN_REDIRECT_URL = 'tienda:inicio'
 LOGOUT_REDIRECT_URL = 'tienda:inicio'
 
+# Configuración HTTPS para Railway y Celulares
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 # ==============================================================================
 # CONFIGURACIÓN DEL PANEL DE ADMINISTRACIÓN (DJANGO UNFOLD)
 # ==============================================================================
